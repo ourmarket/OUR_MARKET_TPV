@@ -10,7 +10,10 @@ export const Categories = ({ categories }) => {
           return (
             <div className={styles.product_card} key={category._id}>
               <Link to={`/categoria/${category._id}`}>
-                <img src={category.img} alt={category.name} />
+                <img
+                  src={`${category.img}?tr=w-300,h-300`}
+                  alt={category.name}
+                />
                 <div className={styles.product_card_name}>
                   <h3>{category.name}</h3>
                 </div>

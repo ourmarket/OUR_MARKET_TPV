@@ -34,16 +34,13 @@
   border: none;
 }
 .main_products {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  /* full responsive in one line */
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 10px;
   padding: 10px;
-  overflow-y: scroll;
-  height: 85vh;
-  align-items: flex-start;
 }
 .product_card {
-  width: 19.3%;
   background-color: white;
   position: relative;
   box-shadow: 2px 2px 5px #cccccc83, -2px -2px 5px #cccccc83;
@@ -53,6 +50,8 @@
   align-items: center;
   gap: 10px;
   min-height: 250px;
+  border-radius: 10px;
+  overflow: hidden;
 }
 .product_card h3 {
   font-size: 25px;
@@ -67,7 +66,10 @@
 }
 .product_card img {
   width: 100%;
+  height: 100%;
   display: block;
+  object-fit: fill;
+  object-position: center;
 }
 .product_card_name {
   position: absolute;

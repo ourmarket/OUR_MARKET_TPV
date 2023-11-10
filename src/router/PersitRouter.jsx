@@ -1,10 +1,11 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import Loading from "../components/loading/Loading";
 import useRefreshToken from "../hooks/useRefreshToken";
-import { getUser } from "../redux/userSlice";
+import { getUser, refreshSession } from "../redux/userSlice";
 
 function PersistLogin() {
   const [isLoading, setIsLoading] = useState(true);
@@ -18,6 +19,7 @@ function PersistLogin() {
     const verifyRefreshToken = async () => {
       try {
         await refresh();
+        dispatch(refreshSession());
       } catch (err) {
         console.log(err);
       } finally {
@@ -25,21 +27,18 @@ function PersistLogin() {
       }
     };
 
-    // persist added here AFTER tutorial video
-    // Avoids unwanted call to verifyRefreshToken
     !token ? verifyRefreshToken() : setIsLoading(false);
 
     return () => (isMounted = false);
   }, []);
 
   /* useEffect(() => {
-    console.log(`isLoading: ${isLoading}`);
-    console.log(`aT: ${token}`);
-  }, [isLoading]); */
-
-  useEffect(() => {
     dispatch(getUser());
-  }, []);
+  }, []); */
+
+  /*  useEffect(() => {
+    dispatch(refreshSession());
+  }, []); */
 
   return isLoading ? <Loading /> : <Outlet />;
 }

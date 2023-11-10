@@ -39,20 +39,17 @@
 }
 .main_products {
   display: grid;
-  /* full responsive in one line */
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 10px;
   padding: 10px;
 }
 .product_card {
-  width: 100%;
-
   position: relative;
   box-shadow: 2px 2px 5px #cccccc83, -2px -2px 5px #cccccc83;
   transition: all 0.4s;
   border-radius: 10px;
   overflow: hidden;
+  min-height: 250px;
 }
 .product_card:hover {
   cursor: pointer;
@@ -60,6 +57,7 @@
 }
 .product_card img {
   width: 100%;
+  height: 100%;
   display: block;
   object-fit: fill;
   object-position: center;

@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useEffect } from "react";
 import styles from "./cashOut.module.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,16 +24,23 @@ import {
 import { CgKeyboard } from "react-icons/cg";
 import { usePutProductStockMutation } from "../../api/apiProducts";
 import { formatQuantity } from "../../utils/formatQuantity";
+import { usePutCashierSessionMutation } from "../../api/apiCashierSession";
 
 export const CashOut = () => {
   const { selectOrder, payment } = useSelector((store) => store.ordersList);
   const { user } = useSelector((store) => store.auth);
+  const { sessionCashier } = useSelector((store) => store.user);
+  const id = selectOrder._id;
+
   const dispatch = useDispatch();
 
   const [sendOrder, { isLoading: l1, isError: e1 }] = usePutOrderMutation();
 
   const [editProductStock, { isLoading: l2, isError: e2 }] =
     usePutProductStockMutation();
+
+  const [updateSession, { isLoading: l3, isError: e3 }] =
+    usePutCashierSessionMutation();
 
   const handleKeyPress = (event) => {
     if (event.key === "Escape") {
@@ -166,10 +174,14 @@ export const CashOut = () => {
       }
     });
     // ---------Update Stock-----------
-    const id = selectOrder._id;
+
     await sendOrder({ id, ...order });
 
-    if (!e1 && !e2) {
+    //guardar la orden en la sesión del cajero
+
+    await updateSession({ id: sessionCashier, newOrderId: id });
+
+    if (!e1 && !e2 && !e3) {
       //close
       dispatch(closeCashOut());
       //confirm
@@ -196,7 +208,7 @@ export const CashOut = () => {
         showConfirmButton: false,
         timer: 2500,
       });
-  }, [e1, e2]);
+  }, [e1, e2, e3]);
 
   return (
     <section className={styles.container}>
@@ -345,7 +357,9 @@ export const CashOut = () => {
               <Receipt />
 
               <button
-                className={`btn-load ${l1 || l2 ? "button--loading" : ""}`}
+                className={`btn-load ${
+                  l1 || l2 || l3 ? "button--loading" : ""
+                }`}
                 type="submit"
                 onClick={handleConfirmOrder}
                 disabled={l1 || l2}

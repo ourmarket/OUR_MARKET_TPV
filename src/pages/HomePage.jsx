@@ -41,7 +41,6 @@ export const HomePage = () => {
     isLoading: l5,
     isError: e5,
   } = useGetDeliveryTrucksQuery();
-  console.log(allDelivery);
 
   useEffect(() => {
     if (allClients && allClientsAddresses && allDelivery) {

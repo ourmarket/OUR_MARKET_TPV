@@ -12,6 +12,7 @@ const uiSlice = createSlice({
     selector: false,
     selectLocalOrder: false,
     selectDeliveryOrder: false,
+    windows: "ventas", //ventas, caja
   },
   reducers: {
     openKeypad: (state) => {
@@ -76,6 +77,12 @@ const uiSlice = createSlice({
     closeCashOut: (state) => {
       state.cashOut = false;
     },
+    cashMode: (state) => {
+      state.windows = "caja";
+    },
+    sellMode: (state) => {
+      state.windows = "ventas";
+    },
   },
 });
 
@@ -101,5 +108,7 @@ export const {
   closeLocalOrder,
   openDeliveryOrder,
   closeDeliveryOrder,
+  cashMode,
+  sellMode,
 } = uiSlice.actions;
 export default uiSlice.reducer;

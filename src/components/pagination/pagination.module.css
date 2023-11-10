@@ -4,7 +4,7 @@
   background-color: var(--color-grey);
   bottom: 0;
   width: 100%;
-  padding: 0 30px;
+  padding: 0 30px 0 20px;
   color: var(--color-white);
 }
 .products_pagination_flex {
@@ -24,4 +24,40 @@
 .flex {
   display: flex;
   gap: 40px;
+}
+
+.products_pagination_buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.products_pagination_btn {
+  background: var(--gradient-grey2);
+  color: var(--color-white);
+  border: none;
+  padding: 20px;
+  border-radius: 10px;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 120px;
+}
+.products_pagination_btn_active {
+  background: var(--gradient-primary);
+  color: var(--color-white);
+  border: none;
+  padding: 20px;
+  border-radius: 10px;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 120px;
 }

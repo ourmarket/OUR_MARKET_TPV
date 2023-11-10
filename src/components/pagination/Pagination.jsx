@@ -4,20 +4,45 @@ import { AiOutlineHome } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { clearSearchOfert } from "../../redux/ofertsSlice";
+import { cashMode, sellMode } from "../../redux/uiSlice";
 
 export const Pagination = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useSelector((store) => store.auth);
+  const { windows } = useSelector((store) => store.ui);
+
   return (
     <div className={styles.products_pagination}>
       <div className={styles.products_pagination_flex}>
-        <div>
-          Vendedor {user?.name} {user?.lastName}
+        <div className={styles.products_pagination_buttons}>
+          <button
+            className={
+              windows === "ventas"
+                ? styles.products_pagination_btn_active
+                : styles.products_pagination_btn
+            }
+            onClick={() => {
+              navigate("/");
+              dispatch(sellMode());
+            }}
+          >
+            Ventas
+          </button>
+          <button
+            className={
+              windows === "caja"
+                ? styles.products_pagination_btn_active
+                : styles.products_pagination_btn
+            }
+            onClick={() => {
+              navigate("/caja");
+              dispatch(cashMode());
+            }}
+          >
+            Caja
+          </button>
         </div>
         <div className={styles.flex}>
-          {/*   <BsChevronDoubleLeft />
-           */}
           <BsChevronLeft
             onClick={() => {
               navigate(-1);

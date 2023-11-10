@@ -183,7 +183,7 @@ export const Ticket = () => {
           icon: "success",
           title: "Orden enviada a caja",
           showConfirmButton: false,
-          timer: 2500,
+          timer: 1500,
         });
       }
 

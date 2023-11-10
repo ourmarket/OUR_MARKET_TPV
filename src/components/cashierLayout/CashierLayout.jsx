@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import styles from "./homeLayout.module.css";
 import { useSelector } from "react-redux";
@@ -11,6 +12,7 @@ import { Delivery } from "../selectClient/Delivery";
 import { Local } from "../selectClient/Local";
 import { Selector } from "../selectClient/Selector";
 import { Pagination } from "../pagination/Pagination";
+import { LoginSessionCashier } from "../loginSessionCashier/LoginSessionCashier";
 
 export const CashierLayout = ({ children }) => {
   const {
@@ -21,6 +23,7 @@ export const CashierLayout = ({ children }) => {
     selectLocalOrder,
     selectDeliveryOrder,
   } = useSelector((store) => store.ui);
+  const { sessionCashier } = useSelector((store) => store.user);
   return (
     <>
       <Menu />
@@ -33,7 +36,8 @@ export const CashierLayout = ({ children }) => {
       <section className={styles.container}>
         <div className={styles.products_container}>
           <NavbarOrder />
-          {children}
+          {!sessionCashier ? <LoginSessionCashier /> : children}
+
           <Pagination />
         </div>
         <div className={styles.ticket_container}>

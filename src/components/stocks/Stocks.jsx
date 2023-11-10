@@ -66,7 +66,7 @@ export const Stocks = () => {
             key={stock._id}
             onClick={() => handleClick(stock)}
           >
-            <img src={stock.img} alt={stock.name} />
+            <img src={`${stock.img}?tr=w-300,h-300`} alt={stock.name} />
             <div className={styles.product_card_name}>
               <h3>Stock: {formatQuantity(stock.stock)} unid.</h3>
             </div>

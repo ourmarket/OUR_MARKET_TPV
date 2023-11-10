@@ -6,6 +6,7 @@ import { CashierPage } from "../pages/CashierPage";
 import { StocksPage } from "../pages/StocksPage";
 import PersistLogin from "./PersitRouter";
 import RequireAuth from "./RequiereAuth";
+import { ResumePage } from "../pages/ResumePage";
 
 export const AppRouter = () => {
   return (
@@ -19,6 +20,7 @@ export const AppRouter = () => {
             <Route path="/categoria/:id" element={<ProductsPage />} />
             <Route path="/oferta/:id" element={<StocksPage />} />
             <Route path="/caja" element={<CashierPage />} />
+            <Route path="/caja/resumen" element={<ResumePage />} />
           </Route>
         </Route>
       </Routes>

@@ -3,10 +3,15 @@ import styles from "./menu.module.css";
 import { closeMenu } from "../../redux/uiSlice";
 import { Link } from "react-router-dom";
 import { logOut } from "../../redux/authSlice";
+import { useSocket } from "../../hooks/useSocket";
+import { apiSlice } from "../../api/apiSlice";
+import { finishSession } from "../../redux/userSlice";
 
 export const Menu = () => {
   const dispatch = useDispatch();
+  const { disconnectSocket } = useSocket();
   const { menu } = useSelector((store) => store.ui);
+  const { sessionCashier } = useSelector((store) => store.user);
   return (
     <section className={menu ? styles.container_active : styles.container}>
       <button
@@ -30,8 +35,12 @@ export const Menu = () => {
         <Link to={"/caja"} onClick={() => dispatch(closeMenu())}>
           <li>Modo Cajero</li>
         </Link>
-        <li>Abrir Caja</li>
-        <li>Cerrar Caja</li>
+        {sessionCashier && (
+          <Link to={"/caja/resumen"} onClick={() => dispatch(closeMenu())}>
+            <li>Resumen Caja</li>
+          </Link>
+        )}
+
         <li>
           <a
             href={import.meta.env.VITE_APP_DASHBOARD}
@@ -42,14 +51,19 @@ export const Menu = () => {
             Administrador
           </a>
         </li>
-        <li
-          onClick={() => {
-            dispatch(logOut());
-            dispatch(closeMenu());
-          }}
-        >
-          Cerrar Sesión
-        </li>
+        {!sessionCashier && (
+          <li
+            onClick={() => {
+              dispatch(logOut());
+              dispatch(finishSession());
+              dispatch(closeMenu());
+              disconnectSocket();
+              dispatch(apiSlice.util.resetApiState());
+            }}
+          >
+            Cerrar Sesión
+          </li>
+        )}
       </ul>
     </section>
   );

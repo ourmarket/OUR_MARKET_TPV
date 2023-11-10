@@ -1,24 +1,31 @@
-import { useEffect, useMemo, useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useCallback, useState } from "react";
+import { useSelector } from "react-redux";
 import io from "socket.io-client";
 
 export const useSocket = (serverPath) => {
-  const socket = useMemo(() => io.connect(serverPath), [serverPath]);
-  const [online, setOnline] = useState(false);
+  const [socket, setSocket] = useState(null);
+  const { token } = useSelector((store) => store.auth);
 
-  useEffect(() => {
-    setOnline(socket.connected);
-  }, [socket]);
+  const connectSocket = useCallback(() => {
+    const socketTemp = io.connect(serverPath, {
+      transports: ["websocket"],
+      autoConnect: true,
+      forceNew: true,
+      query: {
+        "x-token": token,
+      },
+    });
+    setSocket(socketTemp);
+  }, [serverPath, token]);
 
-  useEffect(() => {
-    socket.on("connect", () => setOnline(true));
-  }, [socket]);
-
-  useEffect(() => {
-    socket.on("disconnect", () => setOnline(false));
+  const disconnectSocket = useCallback(() => {
+    socket?.disconnect();
   }, [socket]);
 
   return {
     socket,
-    online,
+    connectSocket,
+    disconnectSocket,
   };
 };

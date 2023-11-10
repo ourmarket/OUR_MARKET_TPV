@@ -44,7 +44,10 @@ export const Products = () => {
                 key={ofert._id}
                 onClick={() => navigate(`/oferta/${ofert._id}`)}
               >
-                <img src={ofert.product.img} alt={ofert.product.name} />
+                <img
+                  src={`${ofert.product.img}?tr=w-300,h-300`}
+                  alt={ofert.product.name}
+                />
                 <div className={styles.product_card_name}>
                   <h3>{ofert.description}</h3>
                 </div>
