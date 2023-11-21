@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 const SignupSchema = Yup.object().shape({
   email: Yup.string().email("Formato invalido").required("*Requerido"),
   password: Yup.string().min(6, "6 caracteres mínimo").required("*Requerido"),
+  clientId: Yup.string().required("*Requerido"),
 });
 
 export const Login = () => {
@@ -21,6 +22,7 @@ export const Login = () => {
     try {
       const userData = await login({
         email: values.email,
+        clientId: values.clientId,
         password: values.password,
       }).unwrap();
       if (userData) {
@@ -48,6 +50,7 @@ export const Login = () => {
           <Formik
             initialValues={{
               email: "",
+              clientId: "",
               password: "",
             }}
             validationSchema={SignupSchema}
@@ -72,6 +75,23 @@ export const Login = () => {
 
                 <ErrorMessage
                   name="email"
+                  component="p"
+                  className="form__error"
+                />
+                <div className={styles.input__container}>
+                  <img
+                    src="https://ik.imagekit.io/mrprwema7/OurMarket/user_OkKLt0tst%20(1)__K2sUFDZJ.png?updatedAt=1695681678392"
+                    alt="icono usuario"
+                  />
+                  <Field
+                    type="text"
+                    name="clientId"
+                    placeholder="Ingresa el id del cliente"
+                  />
+                </div>
+
+                <ErrorMessage
+                  name="clientId"
                   component="p"
                   className="form__error"
                 />
