@@ -6,12 +6,25 @@ import { logOut } from "../../redux/authSlice";
 import { useSocket } from "../../hooks/useSocket";
 import { apiSlice } from "../../api/apiSlice";
 import { finishSession } from "../../redux/userSlice";
+import { useLogoutMutation } from "../../api/apiAuth";
 
 export const Menu = () => {
   const dispatch = useDispatch();
   const { disconnectSocket } = useSocket();
   const { menu } = useSelector((store) => store.ui);
   const { sessionCashier } = useSelector((store) => store.user);
+
+  const [apiLogOut] = useLogoutMutation();
+
+  const handleLogout = () => {
+    dispatch(logOut());
+    dispatch(finishSession());
+    dispatch(closeMenu());
+    disconnectSocket();
+    dispatch(apiSlice.util.resetApiState());
+    apiLogOut();
+  };
+
   return (
     <section className={menu ? styles.container_active : styles.container}>
       <button
@@ -51,19 +64,7 @@ export const Menu = () => {
             Administrador
           </a>
         </li>
-        {!sessionCashier && (
-          <li
-            onClick={() => {
-              dispatch(logOut());
-              dispatch(finishSession());
-              dispatch(closeMenu());
-              disconnectSocket();
-              dispatch(apiSlice.util.resetApiState());
-            }}
-          >
-            Cerrar Sesión
-          </li>
-        )}
+        {!sessionCashier && <li onClick={handleLogout}>Cerrar Sesión</li>}
       </ul>
     </section>
   );

@@ -4,17 +4,23 @@ export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (credentials) => ({
-        url: "/auth/login_cashier_seller",
+        url: "/auth/tpv/login",
         method: "POST",
         body: { ...credentials },
       }),
     }),
+    logout: builder.mutation({
+      query: () => ({
+        url: "/auth/tpv/logout",
+        method: "POST",
+      }),
+    }),
     refresh: builder.query({
-      query: () => "/auth/refresh",
+      query: () => "/auth/tpv/refresh",
       // keepUnusedDataFor: 3,
       extraOptions: { maxRetries: 5 },
     }),
   }),
 });
 
-export const { useLoginMutation, useRefreshQuery } = authApi;
+export const { useLoginMutation, useRefreshQuery, useLogoutMutation } = authApi;

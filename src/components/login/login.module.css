@@ -87,3 +87,17 @@ footer a {
   font-weight: 700;
   color: var(--color-white2);
 }
+.checkbox {
+  text-align: left;
+  margin-left: 9px;
+  margin-top: 15px;
+}
+.checkbox input {
+  margin-right: 25px;
+  font-size: 14px;
+  accent-color: var(--color-primary);
+}
+.checkbox label {
+  font-size: 13px;
+  color: #afaeae;
+}

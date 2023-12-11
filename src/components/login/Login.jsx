@@ -1,11 +1,11 @@
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import styles from "./login.module.css";
-
 import * as Yup from "yup";
 import { useLoginMutation } from "../../api/apiAuth";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../../redux/authSlice";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const SignupSchema = Yup.object().shape({
   email: Yup.string().email("Formato invalido").required("*Requerido"),
@@ -18,6 +18,17 @@ export const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const [rememberMe, setRememberMe] = useState(true);
+
+  useEffect(() => {
+    const storedEmail = localStorage.getItem("rememberedEmail_tpv");
+    const storedClientId = localStorage.getItem("rememberedClientId_tpv");
+
+    if (storedEmail && storedClientId) {
+      setRememberMe(true);
+    }
+  }, []);
+
   const handleSubmit = async (values) => {
     try {
       const userData = await login({
@@ -28,12 +39,21 @@ export const Login = () => {
       if (userData) {
         dispatch(setCredentials({ ...userData }));
 
+        if (rememberMe) {
+          localStorage.setItem("rememberedEmail_tpv", values.email);
+          localStorage.setItem("rememberedClientId_tpv", values.clientId);
+        } else {
+          localStorage.removeItem("rememberedEmail_tpv");
+          localStorage.removeItem("rememberedClientId_tpv");
+        }
+
         navigate("/");
       }
     } catch (error) {
       console.log(error);
     }
   };
+
   return (
     <main className={styles.container}>
       <div className={styles.left}>
@@ -49,8 +69,12 @@ export const Login = () => {
           <h2>TPV - Ingresar</h2>
           <Formik
             initialValues={{
-              email: "",
-              clientId: "",
+              email: rememberMe
+                ? localStorage.getItem("rememberedEmail_tpv") || ""
+                : "",
+              clientId: rememberMe
+                ? localStorage.getItem("rememberedClientId_tpv") || ""
+                : "",
               password: "",
             }}
             validationSchema={SignupSchema}
@@ -112,12 +136,22 @@ export const Login = () => {
                   component="p"
                   className="form__error"
                 />
+                <div className={styles.checkbox}>
+                  <input
+                    type="checkbox"
+                    name="remember"
+                    id="remember"
+                    checked={rememberMe}
+                    onChange={() => setRememberMe(!rememberMe)}
+                  />
+                  <label htmlFor="remember">Recordar</label>
+                </div>
 
                 <button
                   className={`btn-load ${isLoading ? "button--loading" : ""}`}
                   type="submit"
                   disabled={isLoading}
-                  style={{ marginTop: "40px" }}
+                  style={{ marginTop: "20px" }}
                 >
                   <span className="button__text">Enviar</span>
                 </button>
