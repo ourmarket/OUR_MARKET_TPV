@@ -40,6 +40,7 @@ const Order = ({ order }) => {
 export const Orders = () => {
   const { orders } = useSelector((store) => store.ordersList);
   const { data, isLoading, isError } = useGetCashierOrdersQuery();
+  console.log(data);
   const dispatch = useDispatch();
 
   const { socket } = useContext(SocketContext);

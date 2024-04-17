@@ -9,7 +9,7 @@ export const ofertApi = apiSlice.injectEndpoints({
 
   endpoints: (builder) => ({
     getOferts: builder.query({
-      query: () => "/oferts",
+      query: (stock) => `/oferts?stock=${stock}`,
       // keepUnusedDataFor: 3,
       extraOptions: { maxRetries: 5 },
       providesTags: ["oferts"],

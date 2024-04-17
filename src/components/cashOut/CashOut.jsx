@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { useEffect } from "react";
 import styles from "./cashOut.module.css";
@@ -22,8 +23,6 @@ import {
   setTransfer,
 } from "../../redux/ordersSlice";
 import { CgKeyboard } from "react-icons/cg";
-import { usePutProductStockMutation } from "../../api/apiProducts";
-import { formatQuantity } from "../../utils/formatQuantity";
 import { usePutCashierSessionMutation } from "../../api/apiCashierSession";
 
 export const CashOut = () => {
@@ -35,9 +34,6 @@ export const CashOut = () => {
   const dispatch = useDispatch();
 
   const [sendOrder, { isLoading: l1, isError: e1 }] = usePutOrderMutation();
-
-  const [editProductStock, { isLoading: l2, isError: e2 }] =
-    usePutProductStockMutation();
 
   const [updateSession, { isLoading: l3, isError: e3 }] =
     usePutCashierSessionMutation();
@@ -113,7 +109,27 @@ export const CashOut = () => {
       cashierMode: false, // cambiamos a false porque va a db definitivamente
       receiptId: selectOrder?.receiptId,
 
-      orderItems: selectOrder.orderItems,
+      orderItems: selectOrder.orderItems.map((product) => ({
+        uniqueId: product?.uniqueId || null,
+        productId: product.productId,
+        name: product.name,
+        unit: product.unit,
+        description: product?.description || null,
+        img: product.img,
+        totalQuantity: product.totalQuantity,
+        totalPrice: product.totalPrice,
+        unitPrice: product.unitPrice,
+        unitCost: product.unitCost,
+        stockId: null,
+        stockData: product.allStockData.map((stock) => ({
+          stockId: stock.stockId,
+          unitCost: stock.unitCost,
+          quantityOriginal: stock.quantity,
+          quantityNew: stock.stock,
+          quantityModify: stock.modify,
+          dateStock: stock.dateStock,
+        })),
+      })),
 
       shippingAddress: selectOrder.shippingAddress,
 
@@ -144,36 +160,7 @@ export const CashOut = () => {
       state: true, // cambiar en producción
     };
 
-    // ---------Update Stock-----------
-    const updateProductsStocks = selectOrder.originalStock.map((product) => {
-      if (product.new) {
-        return {
-          productId: product.productId,
-          // nuevo producto
-          totalQuantity: product.newQuantity,
-          stockId: product.stockId,
-        };
-      } else {
-        return {
-          productId: product.productId,
-          // negativo devolución de stock
-          // positivo agregar mas stock
-          totalQuantity: product.newQuantity - product.totalQuantity,
-          stockId: product.stockId,
-        };
-      }
-    });
-    updateProductsStocks.map(async (product) => {
-      if (product.totalQuantity !== 0) {
-        const updateData = {
-          stockId: product.stockId,
-          totalQuantity: formatQuantity(product.totalQuantity),
-        };
-        const id = product.productId;
-        await editProductStock({ id, ...updateData }).unwrap();
-      }
-    });
-    // ---------Update Stock-----------
+    console.log(order);
 
     await sendOrder({ id, ...order });
 
@@ -181,7 +168,7 @@ export const CashOut = () => {
 
     await updateSession({ id: sessionCashier, newOrderId: id });
 
-    if (!e1 && !e2 && !e3) {
+    if (!e1 && !e3) {
       //close
       dispatch(closeCashOut());
       //confirm
@@ -199,7 +186,7 @@ export const CashOut = () => {
   };
 
   useEffect(() => {
-    if (e1 || e2)
+    if (e1)
       Swal.fire({
         position: "center",
         icon: "error",
@@ -208,7 +195,7 @@ export const CashOut = () => {
         showConfirmButton: false,
         timer: 2500,
       });
-  }, [e1, e2, e3]);
+  }, [e1, e3]);
 
   return (
     <section className={styles.container}>
@@ -357,12 +344,10 @@ export const CashOut = () => {
               <Receipt />
 
               <button
-                className={`btn-load ${
-                  l1 || l2 || l3 ? "button--loading" : ""
-                }`}
+                className={`btn-load ${l1 || l3 ? "button--loading" : ""}`}
                 type="submit"
                 onClick={handleConfirmOrder}
-                disabled={l1 || l2}
+                disabled={l1}
                 style={{ width: "50%" }}
               >
                 <span

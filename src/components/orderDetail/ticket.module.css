@@ -22,6 +22,7 @@
   border: none;
   font-size: 20px;
   border-radius: 10px;
+  flex: 1;
 }
 .ticket_btn_delete:disabled {
   background: var(--gradient-grey1);
@@ -36,6 +37,7 @@
   border: none;
   font-size: 20px;
   border-radius: 10px;
+  flex: 1;
 }
 .ticket_btn_quantity:disabled {
   background: var(--gradient-grey1);
@@ -54,6 +56,7 @@
   color: white;
   border: none;
   border-radius: 10px;
+  flex: 1;
 }
 .ticket_code:disabled {
   background: var(--gradient-grey1);

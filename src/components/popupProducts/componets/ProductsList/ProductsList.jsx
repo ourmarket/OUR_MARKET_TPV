@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 import { updateProductOrder } from "../../../../redux/ordersSlice";
 import Swal from "sweetalert2";
 import { formatQuantity } from "../../../../utils/formatQuantity";
+import { updateStockFunction } from "../../../../utils/adjustStock";
 
 const ProductStock = ({ selectOfert, setSelectOfert }) => {
   const dispatch = useDispatch();
@@ -81,40 +82,81 @@ const ProductStock = ({ selectOfert, setSelectOfert }) => {
   );
 };
 
-export const ProductsList = ({ oferts, value }) => {
+export const ProductsList = ({ oferts, value, ofertStock }) => {
+  const dispatch = useDispatch();
   const [selectOfert, setSelectOfert] = useState(null);
-  const filterOferts = oferts.filter((ofert) => {
-    const ofertLowerCase = ofert.description.toLowerCase();
 
-    return ofertLowerCase.includes(value.toLowerCase());
-  });
+  const allOferts = ofertStock
+    .filter((ofert) => ofert.stock.length > 0)
+    .map((product) => ({
+      ...product,
+      stockQuantity: product.stock.reduce((acc, curr) => acc + curr.stock, 0),
+    }))
+    .sort((a, b) => {
+      if (a.description < b.description) {
+        return -1;
+      }
+      if (a.description > b.description) {
+        return 1;
+      }
+      return 0;
+    });
 
-  if (selectOfert) {
-    return (
-      <ProductStock selectOfert={selectOfert} setSelectOfert={setSelectOfert} />
-    );
-  }
+  const handleClick = (ofert) => {
+    const newProduct = {
+      visible: true,
+      uniqueId: uuidv4(), //nuevo, este va db
+      productId: ofert.product._id,
+      name: ofert.product.name,
+      unit: ofert.product.unit,
+      description: ofert.description,
+      img: ofert.product.img,
+
+      totalQuantity: 1,
+      totalPrice: ofert.basePrice,
+      unitPrice: ofert.basePrice,
+
+      unitCost: null,
+      stockId: null,
+      new: true, // no va a db
+
+      maxStock: ofert.stock.reduce((acc, curr) => acc + curr.stock, 0),
+      stock: ofert.stock,
+      stockModify: updateStockFunction(ofert.stock, 1),
+      ofertId: ofert._id,
+    };
+    console.log(newProduct);
+    console.log(ofert);
+    dispatch(updateProductOrder(newProduct));
+    Swal.fire({
+      position: "center",
+      icon: "success",
+      title: "Producto cargado",
+      showConfirmButton: false,
+      timer: 2000,
+    });
+  };
 
   return (
     <section className={styles.container}>
       <div className={styles.product_title}>
         <h3 className={styles.col1}>Producto</h3>
-        <h3 className={styles.col2}>Categoria</h3>
+        <h3 className={styles.col2}>Stock</h3>
         <h3 className={styles.col3}>Precio</h3>
       </div>
-      {filterOferts.map((ofert) => {
+      {allOferts.map((ofert) => {
         return (
           <div
             className={styles.product}
             key={ofert._id}
-            onClick={() => setSelectOfert(ofert)}
+            onClick={() => handleClick(ofert)}
           >
             <div className={styles.col1}>
               <img src={ofert.product.img} alt={ofert.description} />
               <h3>{ofert.description}</h3>
             </div>
 
-            <h3 className={styles.col2}>{ofert.category.name}</h3>
+            <h3 className={styles.col2}>{ofert.stockQuantity} unid.</h3>
             <h3 className={styles.col3}>{formatPrice(ofert.basePrice)}</h3>
           </div>
         );

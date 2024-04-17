@@ -9,7 +9,7 @@ export const Products = () => {
   const { id } = useParams();
   const { searchOfert, allOferts } = useSelector((store) => store.oferts);
   const filterOferts = allOferts
-    .filter((ofert) => ofert.category._id == id)
+    .filter((ofert) => ofert.product.category == id && ofert.stock.length > 0)
     .sort((a, b) => {
       if (a.description < b.description) {
         return -1;

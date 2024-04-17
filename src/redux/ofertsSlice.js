@@ -11,6 +11,18 @@ const ofertsSlice = createSlice({
     getAllOferts: (state, action) => {
       state.allOferts = action.payload;
     },
+    updateOfert: (state, action) => {
+      state.allOferts = state.allOferts.map((ofert) => {
+        if (ofert._id === action.payload.id) {
+          return {
+            ...ofert,
+            stock: action.payload.stock,
+          };
+        } else {
+          return ofert;
+        }
+      });
+    },
 
     setSearchOfert: (state, action) => {
       state.searchOfert = action.payload;
@@ -25,6 +37,11 @@ const ofertsSlice = createSlice({
   },
 });
 
-export const { getAllOferts, setSearchOfert, clearSearchOfert, setSearchTerm } =
-  ofertsSlice.actions;
+export const {
+  getAllOferts,
+  updateOfert,
+  setSearchOfert,
+  clearSearchOfert,
+  setSearchTerm,
+} = ofertsSlice.actions;
 export default ofertsSlice.reducer;

@@ -1,5 +1,9 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
-import { useGetOfertWithCategoryQuery } from "../../api/apiOfert";
+import {
+  useGetOfertWithCategoryQuery,
+  useGetOfertsQuery,
+} from "../../api/apiOfert";
 import Loading from "../loading/Loading";
 import styles from "./popupProducts.module.css";
 import { useDispatch } from "react-redux";
@@ -16,6 +20,9 @@ export const PopupProducts = () => {
     isLoading: l1,
     isError: e1,
   } = useGetOfertWithCategoryQuery();
+  const { data: data, isLoading: l2, isError: e2 } = useGetOfertsQuery(1);
+  console.log(ofertsData);
+  console.log(data);
 
   useEffect(() => {
     if (ofertsData) {
@@ -47,7 +54,11 @@ export const PopupProducts = () => {
         {l1 && <Loading />}
         {e1 && <p>Ha ocurrido un error</p>}
         {ofertsData && (
-          <ProductsList oferts={ofertsData.data.oferts} value={value} />
+          <ProductsList
+            oferts={ofertsData.data.oferts}
+            value={value}
+            ofertStock={data.data.oferts}
+          />
         )}
       </div>
     </section>

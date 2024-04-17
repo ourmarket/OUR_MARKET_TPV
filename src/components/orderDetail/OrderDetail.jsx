@@ -3,24 +3,22 @@ import { useDispatch, useSelector } from "react-redux";
 import styles from "./ticket.module.css";
 import {
   keypadModePrice,
-  keypadModeQuantity,
+  keypadModeQuantityCashier,
   openCashOut,
   openKeypad,
   openLocalOrder,
-  openPopupProducts,
 } from "../../redux/uiSlice";
 import { formatPrice } from "../../utils/formatPrice";
 import {
   clearActiveProduct,
-  deleteActiveProduct,
   deleteOrder,
   setActiveProduct,
+  updateQuantityActiveProduct,
 } from "../../redux/ordersSlice";
 import Swal from "sweetalert2";
 import { useDeleteOrderMutation } from "../../api/apiOrder";
 import { useEffect } from "react";
-import { formatQuantity } from "../../utils/formatQuantity";
-import { usePutProductStockMutation } from "../../api/apiProducts";
+import { adjustStock } from "../../utils/adjustStock";
 
 const Product = ({ product }) => {
   const { activeProduct } = useSelector((store) => store.ordersList);
@@ -66,10 +64,8 @@ export const OrderDetail = () => {
 
   const [deleteOrderApi, { isLoading: l1, isError: e1 }] =
     useDeleteOrderMutation();
-  const [editProductStock, { isLoading: l2, isError: e2 }] =
-    usePutProductStockMutation();
 
-  const handleDelete = () => {
+  const handleDeleteProduct = () => {
     Swal.fire({
       title: "Deseas borrar este producto?",
       text: "Este cambio no se puede revertir",
@@ -77,35 +73,36 @@ export const OrderDetail = () => {
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Borrar",
-    }).then(async (result) => {
+    }).then((result) => {
       if (result.isConfirmed) {
-        const productToEdit = selectOrder.originalStock.filter(
+        const selectProductCashier = selectOrder.orderItems.filter(
           (product) => product.uniqueId === activeProduct
         );
 
-        const updateData = {
-          stockId: productToEdit[0].stockId,
-          totalQuantity: -productToEdit[0].totalQuantity, // negativo porque es una devolución de stock original
-        };
+        const modifyStock = adjustStock(
+          selectProductCashier[0].originalTotalQuantity,
+          0,
+          selectProductCashier[0].availableStock,
+          selectProductCashier[0].stockData,
+          selectProductCashier[0].originalUnitCost
+        );
 
-        const id = productToEdit[0].productId;
+        dispatch(
+          updateQuantityActiveProduct({
+            id: activeProduct,
+            value: 0,
+            unitCost: modifyStock.unitCost,
+            modifyStockData: modifyStock.modifyStock,
+            modifyAvailableStock: modifyStock.availableStock,
+            visible: false,
+          })
+        );
 
-        const res = await editProductStock({ id, ...updateData }).unwrap();
-        console.log(res);
-
-        if (!e2) {
-          dispatch(deleteActiveProduct(activeProduct));
-        }
+        // dispatch(deleteActiveProduct(activeProduct));
       }
     });
   };
   const handleDeleteOrder = () => {
-    const updateProducts = selectOrder.orderItems.map((product) => ({
-      productId: product.productId,
-      totalQuantity: -product.totalQuantity, // negativo porque es una devolución de stock
-      stockId: product.stockId,
-    }));
-
     Swal.fire({
       title: "Deseas borrar esta Orden?",
       text: "Este cambio no se puede revertir",
@@ -115,17 +112,8 @@ export const OrderDetail = () => {
       confirmButtonText: "Borrar",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        updateProducts.map(async (product) => {
-          const updateData = {
-            stockId: product.stockId,
-            totalQuantity: formatQuantity(product.totalQuantity),
-          };
-          const id = product.productId;
-          await editProductStock({ id, ...updateData }).unwrap();
-        });
-
         await deleteOrderApi(selectOrder._id);
-        if (!e1 && !e2) {
+        if (!e1) {
           dispatch(deleteOrder(selectOrder.orderId));
         }
       }
@@ -133,7 +121,7 @@ export const OrderDetail = () => {
   };
 
   useEffect(() => {
-    if (e1 || e2)
+    if (e1)
       Swal.fire({
         position: "center",
         icon: "error",
@@ -142,7 +130,7 @@ export const OrderDetail = () => {
         showConfirmButton: false,
         timer: 2500,
       });
-  }, [e1, e2]);
+  }, [e1]);
 
   const handleOpenClient = () => {
     dispatch(openLocalOrder());
@@ -155,7 +143,7 @@ export const OrderDetail = () => {
           className={styles.ticket_btn_quantity}
           onClick={() => {
             dispatch(openKeypad());
-            dispatch(keypadModeQuantity());
+            dispatch(keypadModeQuantityCashier());
           }}
           disabled={!activeProduct ? true : false}
         >
@@ -171,16 +159,16 @@ export const OrderDetail = () => {
         >
           Precio
         </button>
-        <button
+        {/*  <button
           className={styles.ticket_btn_products}
           onClick={() => dispatch(openPopupProducts())}
           disabled={!selectOrder}
         >
           +Productos
-        </button>
+        </button> */}
         <button
           className={styles.ticket_btn_delete}
-          onClick={handleDelete}
+          onClick={handleDeleteProduct}
           disabled={!activeProduct ? true : false}
         >
           Borrar
@@ -188,9 +176,11 @@ export const OrderDetail = () => {
       </div>
       {selectOrder && (
         <div className={styles.products}>
-          {selectOrder.orderItems.map((product) => (
-            <Product product={product} key={product.uniqueId} />
-          ))}
+          {selectOrder.orderItems
+            .filter((product) => product.visible)
+            .map((product) => (
+              <Product product={product} key={product.uniqueId} />
+            ))}
         </div>
       )}
       <div className={styles.bottom}>
@@ -225,19 +215,19 @@ export const OrderDetail = () => {
         </div>
         <div className={styles.footer}>
           <button
-            className={`btn-load ${l1 || l2 ? "button--loading" : ""}`}
+            className={`btn-load ${l1 ? "button--loading" : ""}`}
             type="submit"
             onClick={() => dispatch(openCashOut())}
-            disabled={!selectOrder || l1 || l2}
+            disabled={!selectOrder || l1}
             style={{ width: "50%", padding: "20px" }}
           >
             <span className="button__text">$ Cobrar</span>
           </button>
           <button
-            className={`btn-load grey ${l1 || l2 ? "button--loading" : ""}`}
+            className={`btn-load grey ${l1 ? "button--loading" : ""}`}
             type="submit"
             onClick={handleDeleteOrder}
-            disabled={!selectOrder || l1 || l2}
+            disabled={!selectOrder || l1}
             style={{ width: "50%", padding: "20px" }}
           >
             <span className="button__text">Borrar</span>

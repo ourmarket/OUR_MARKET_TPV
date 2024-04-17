@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useGetCategoriesQuery } from "../api/apiCategory";
 import Loading from "../components/loading/Loading";
-import { useGetOfertWithCategoryQuery } from "../api/apiOfert";
+import { useGetOfertsQuery } from "../api/apiOfert";
 import { HomeLayout } from "../components/homeLayout/HomeLayout";
 import { Categories } from "../components/categories/Categories";
 import { useGetClientsQuery } from "../api/apiClient";
@@ -11,10 +12,10 @@ import {
   getAllClientsAddresses,
   getAllDeliveries,
 } from "../redux/clientsSlice";
-import { getAllOferts } from "../redux/ofertsSlice";
 import { Products } from "../components/products/Products";
 import { useGetClientAddressesQuery } from "../api/apiClientsAddress";
 import { useGetDeliveryTrucksQuery } from "../api/apiDeliveryTruck";
+import { getAllOferts } from "../redux/ofertsSlice";
 
 export const HomePage = () => {
   const dispatch = useDispatch();
@@ -24,11 +25,7 @@ export const HomePage = () => {
     isLoading: l1,
     isError: e1,
   } = useGetCategoriesQuery();
-  const {
-    data: ofertsData,
-    isLoading: l2,
-    isError: e2,
-  } = useGetOfertWithCategoryQuery();
+  const { data: ofertsData, isLoading: l2, isError: e2 } = useGetOfertsQuery(1);
 
   const { data: allClients, isLoading: l3, isError: e3 } = useGetClientsQuery();
   const {
@@ -43,41 +40,13 @@ export const HomePage = () => {
   } = useGetDeliveryTrucksQuery();
 
   useEffect(() => {
-    if (allClients && allClientsAddresses && allDelivery) {
+    if (allClients && allClientsAddresses && allDelivery && ofertsData) {
       dispatch(getAllClients(allClients.data.clients));
       dispatch(getAllClientsAddresses(allClientsAddresses.data.clientAddress));
       dispatch(getAllDeliveries(allDelivery.data.deliveryTrucks));
+      dispatch(getAllOferts(ofertsData.data.oferts));
     }
-  }, [allClients, allClientsAddresses, allDelivery, dispatch]);
-
-  useEffect(() => {
-    if (ofertsData) {
-      const productsWithStockField = ofertsData.data.oferts
-        .filter((ofert) => ofert.product.stock)
-        .map((ofert) => {
-          const stock = ofert.product.stock.reduce(
-            (acc, curr) => curr.stock + acc,
-            0
-          );
-          if (stock > 0) {
-            return {
-              ...ofert,
-              existStock: true,
-            };
-          }
-          return {
-            ...ofert,
-            existStock: false,
-          };
-        });
-
-      const productWithStock = productsWithStockField.filter(
-        (product) => product.existStock
-      );
-
-      dispatch(getAllOferts(productWithStock));
-    }
-  }, [ofertsData, dispatch]);
+  }, [allClients, allClientsAddresses, allDelivery, ofertsData, dispatch]);
 
   return (
     <>

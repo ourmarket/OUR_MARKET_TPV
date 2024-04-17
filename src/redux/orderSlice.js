@@ -88,6 +88,7 @@ const orderSlice = createSlice({
             ...product,
             totalPrice: +action.payload.value * product.unitPrice,
             totalQuantity: +action.payload.value,
+            stockModify: action.payload.stock,
           };
         } else {
           return product;

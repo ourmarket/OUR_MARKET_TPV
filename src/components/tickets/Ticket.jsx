@@ -22,9 +22,9 @@ import { useContext, useEffect } from "react";
 import { SocketContext } from "../../context/SocketContext";
 import { AiOutlineDelete } from "react-icons/ai";
 import { GoNumber } from "react-icons/go";
-import { usePutProductStockMutation } from "../../api/apiProducts";
 import { useNavigate } from "react-router-dom";
 import { BsTruck } from "react-icons/bs";
+import { calculateAverageUnityCost } from "../../utils/adjustStock";
 
 const Product = ({ product }) => {
   const { active } = useSelector((store) => store.order);
@@ -82,8 +82,6 @@ export const Ticket = () => {
   const { user } = useSelector((store) => store.auth);
 
   const [sendOrder, { isLoading: l1, isError: e1 }] = usePostOrderMutation();
-  const [editProductStock, { isLoading: l2, isError: e2 }] =
-    usePutProductStockMutation();
 
   const handleDelete = () => {
     dispatch(deleteProduct(active));
@@ -98,7 +96,30 @@ export const Ticket = () => {
       cashierMode: !deliveryTruck ? true : false, // para ser vista por el cajero al buscar en db
       receiptId: Date.now(),
 
-      orderItems: products,
+      orderItems: products.map((item) => ({
+        visible: true,
+        uniqueId: item.uniqueId,
+        productId: item.productId,
+        name: item.name,
+        unit: item.unit,
+        description: item.description,
+        img: item.img,
+        totalQuantity: item.totalQuantity,
+        totalPrice: item.totalPrice,
+        unitPrice: item.unitPrice,
+        unitCost: calculateAverageUnityCost(item.stockModify),
+        stockId: null,
+        stockData: item.stockModify
+          .filter((stock) => stock.quantity !== stock.stock)
+          .map((stock) => ({
+            stockId: stock._id,
+            quantityOriginal: stock.quantity,
+            quantityNew: stock.stock,
+            quantityModify: stock.modify,
+            unitCost: stock.unityCost,
+            dateStock: stock.createdAt,
+          })),
+      })),
 
       shippingAddress: {
         addressId: shippingAddress?.addressId || null,
@@ -146,27 +167,10 @@ export const Ticket = () => {
       clientFullName: `${client.user.name} ${client.user.lastName}`,
       date: new Date(),
     };
-
-    const productsToEdit = products.map((product) => ({
-      productId: product.productId,
-      stockId: product.stockId,
-      totalQuantity: product.totalQuantity,
-    }));
-
     console.log(order);
     const res1 = await sendOrder(order);
 
-    productsToEdit.map(async (product) => {
-      const updateData = {
-        /*  stockId: product.stockId, */
-        totalQuantity: product.totalQuantity,
-      };
-      const id = product.productId;
-      const res2 = await editProductStock({ id, ...updateData }).unwrap();
-      console.log(res2);
-    });
-
-    if (!e1 || !e2) {
+    if (!e1) {
       socket.emit("order", res1.data.data.order);
 
       if (deliveryTruck) {
@@ -193,7 +197,7 @@ export const Ticket = () => {
   };
 
   useEffect(() => {
-    if (e1 || e2)
+    if (e1)
       Swal.fire({
         position: "center",
         icon: "error",
@@ -202,7 +206,7 @@ export const Ticket = () => {
         showConfirmButton: false,
         timer: 2500,
       });
-  }, [e1, e2]);
+  }, [e1]);
 
   return (
     <section className={styles.container}>
@@ -299,10 +303,10 @@ export const Ticket = () => {
             Enviar a caja
           </button> */}
           <button
-            className={`btn-load ${l1 || l2 ? "button--loading" : ""}`}
+            className={`btn-load ${l1 ? "button--loading" : ""}`}
             type="submit"
             onClick={handleSendOrder}
-            disabled={!products || !client || l1 || l2}
+            disabled={!products || !client || l1}
             style={{ width: "50%", padding: "20px" }}
           >
             <span className="button__text">Enviar</span>

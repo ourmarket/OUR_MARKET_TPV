@@ -59,6 +59,9 @@ const uiSlice = createSlice({
     keypadModeQuantity: (state) => {
       state.keypad_mode = "quantity";
     },
+    keypadModeQuantityCashier: (state) => {
+      state.keypad_mode = "quantity_cashier";
+    },
     keypadModePrice: (state) => {
       state.keypad_mode = "price";
     },
@@ -89,7 +92,7 @@ const uiSlice = createSlice({
 export const {
   openKeypad,
   closeKeypad,
-
+  keypadModeQuantityCashier,
   changeMode,
   openMenu,
   closeMenu,
