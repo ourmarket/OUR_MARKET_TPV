@@ -143,12 +143,14 @@ export function calculateAverageUnityCost(stockArray) {
 }
 
 function sortByCreatedAt(arr) {
+  console.log(arr);
   return arr
     .slice()
     .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 }
 
 export function updateStockFunction(stock, rest) {
+  console.log(stock);
   const sortedStock = sortByCreatedAt(stock);
   let remainingRest = rest;
 

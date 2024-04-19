@@ -21,6 +21,12 @@ export const ofertApi = apiSlice.injectEndpoints({
       extraOptions: { maxRetries: 3 },
       providesTags: ["oferts"],
     }),
+    getOfertQuery: builder.query({
+      query: ({ id, stock }) => `/oferts/${id}?stock=${stock}`,
+      // keepUnusedDataFor: 3,
+      extraOptions: { maxRetries: 3 },
+      providesTags: ["oferts"],
+    }),
     getOfertByProductId: builder.query({
       query: (id) => `/oferts/product/${id}`,
       // keepUnusedDataFor: 3,
@@ -48,6 +54,7 @@ export const ofertApi = apiSlice.injectEndpoints({
 export const {
   useGetOfertsQuery,
   useGetOfertQuery,
+  useGetOfertQueryQuery,
   useGetOfertByProductIdQuery,
   useGetOfertWithCategoryQuery,
   usePostOrderMutation,

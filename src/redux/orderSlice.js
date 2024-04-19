@@ -17,6 +17,7 @@ const orderSlice = createSlice({
     validStockQuantity: true,
     active: null,
     maxStock: null,
+    sentToDeliveryTruck: null,
   },
   reducers: {
     addProduct: (state, action) => {
@@ -110,6 +111,9 @@ const orderSlice = createSlice({
     isValidStockOrder: (state, action) => {
       state.validStockQuantity = action.payload;
     },
+    sentToDeliveryTruck: (state, action) => {
+      state.sentToDeliveryTruck = action.payload;
+    },
     clearCart: (state) => {
       state.products = [];
       state.shippingAddress = null;
@@ -121,6 +125,7 @@ const orderSlice = createSlice({
       state.validStockQuantity = true;
       state.active = null;
       state.maxStock = null;
+      state.sentToDeliveryTruck = null;
     },
     setActiveProduct: (state, action) => {
       state.active = action.payload.uniqueId;
@@ -146,5 +151,6 @@ export const {
   updateQuantityProduct,
   addDeliveryTruck,
   addShippingCost,
+  sentToDeliveryTruck,
 } = orderSlice.actions;
 export default orderSlice.reducer;

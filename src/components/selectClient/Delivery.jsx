@@ -5,6 +5,7 @@ import {
   addClient,
   addDeliveryTruck,
   addShippingCost,
+  sentToDeliveryTruck,
 } from "../../redux/orderSlice";
 import { closeDeliveryOrder } from "../../redux/uiSlice";
 
@@ -17,11 +18,15 @@ export const Delivery = () => {
   const [value, setValue] = useState("");
   const [selectClient, setSelectClient] = useState(null);
   const [deliveryTruck, setDeliveryTruck] = useState(null);
+  const [active, setActive] = useState(false);
   const [shippingCost, setShippingCost] = useState(0);
   const [error, setError] = useState(null);
 
   const onChange = (event) => {
     setValue(event.target.value);
+  };
+  const onChangeActive = (event) => {
+    setActive(event.target.value);
   };
   const onChangeShippingCost = (event) => {
     setShippingCost(event.target.value);
@@ -51,6 +56,7 @@ export const Delivery = () => {
       dispatch(addClient(selectClient));
       dispatch(closeDeliveryOrder());
       dispatch(addShippingCost(+shippingCost));
+      dispatch(sentToDeliveryTruck(active));
     }
   };
 
@@ -128,12 +134,12 @@ export const Delivery = () => {
               </select>
               {error && <p className={styles.error}>*Dato obligatorio</p>}
             </div>
-            <div className={styles.field}>
+            {/*   <div className={styles.field}>
               <span>Nombre cliente</span>
               <p>
                 {selectClient.user.name} {selectClient.user.lastName}
               </p>
-            </div>
+            </div> */}
             <div className={styles.field}>
               <span>Zona</span>
               <p>{selectClient.deliveryZone.name}</p>
@@ -150,6 +156,19 @@ export const Delivery = () => {
                 onChange={(e) => onChangeShippingCost(e)}
                 id={styles.input__shippingCost}
               />
+            </div>
+            <div className={styles.field_input}>
+              <span>Enviar a repartidor</span>
+              <select
+                name="delivery"
+                className={styles.delivery_select}
+                onChange={(e) => onChangeActive(e)}
+                value={active}
+              >
+                <option value={false}>No</option>
+                <option value={true}>Si</option>
+              </select>
+              {error && <p className={styles.error}>*Dato obligatorio</p>}
             </div>
 
             <button className={styles.btn_send} onClick={handleSend}>

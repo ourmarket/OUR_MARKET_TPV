@@ -176,6 +176,7 @@
 .delivery_select option:hover {
   background-color: var(--color-primary);
 }
+
 .delivery_select_error {
   width: 100%;
   border: 1px solid #fd0202;

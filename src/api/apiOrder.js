@@ -28,7 +28,7 @@ export const orderApi = apiSlice.injectEndpoints({
     }),
 
     getOrder: builder.query({
-      query: (id) => `/orders/${id}`,
+      query: ({ id, stock }) => `/orders/${id}?stock=${stock}`,
       // keepUnusedDataFor: 3,
       extraOptions: { maxRetries: 3 },
       providesTags: ["orders"],

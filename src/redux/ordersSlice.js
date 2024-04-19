@@ -49,7 +49,7 @@ const ordersListSlice = createSlice({
           originalTotalQuantity: product.totalQuantity,
           originalUnitCost: product.unitCost,
           visible: true,
-
+          // estos vienen de stockData
           allStockData: product.stockData.map((stock) => ({
             stockId: stock.stockId,
             quantity: stock.quantityOriginal,
@@ -74,24 +74,32 @@ const ordersListSlice = createSlice({
             unitCost: stock.unitCost,
             dateStock: stock.dateStock,
           })),
-          modifyAvailableStock: product.stockAvailable.map((stock) => ({
-            stockId: stock._id,
-            quantity: stock.quantity,
-            stock: stock.stock,
-            unitCost: stock.unityCost,
-            dateStock: stock.createdAt,
-          })),
-          availableStock: product.stockAvailable.map((stock) => ({
-            stockId: stock._id,
-            quantity: stock.quantity,
-            stock: stock.stock,
-            unitCost: stock.unityCost,
-            dateStock: stock.createdAt,
-          })),
+
+          // estos vienen del stock de todos los productos de la orden
+          modifyAvailableStock: action.payload.stock
+            .filter((s) => s.product === product.productId)[0]
+            .stock.map((stock) => ({
+              stockId: stock?._id,
+              quantity: stock?.quantity,
+              stock: stock?.stock,
+              unitCost: stock?.unityCost,
+              dateStock: stock?.createdAt,
+            })),
+
+          availableStock: action.payload.stock
+            .filter((s) => s.product === product.productId)[0]
+            .stock.map((stock) => ({
+              stockId: stock?._id,
+              quantity: stock?.quantity,
+              stock: stock?.stock,
+              unitCost: stock?.unityCost,
+              dateStock: stock?.createdAt,
+            })),
         })),
       };
       state.orders = [...state.orders, newOrder];
     },
+
     addOrders: (state, action) => {
       state.orders = action.payload.map((order) => ({
         ...order,
@@ -404,6 +412,7 @@ const ordersListSlice = createSlice({
 export const {
   addOrder,
   addOrders,
+
   addSelectOrder,
   clearSelectOrder,
   setActiveProduct,

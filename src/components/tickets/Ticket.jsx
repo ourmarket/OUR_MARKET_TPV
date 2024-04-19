@@ -77,6 +77,7 @@ export const Ticket = () => {
     deliveryTruck,
     shippingAddress,
     shippingCost,
+    sentToDeliveryTruck,
   } = useSelector((store) => store.order);
 
   const { user } = useSelector((store) => store.auth);
@@ -145,7 +146,7 @@ export const Ticket = () => {
       total: subTotal + shippingCost,
 
       status: "Pendiente", // Entregado
-      active: deliveryTruck ? true : false, //solo si es de reparto
+      active: sentToDeliveryTruck ? sentToDeliveryTruck : false, //solo si es de reparto
 
       commentary: "",
 
