@@ -5,23 +5,17 @@ import { IoMdArrowBack } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import { clearSearchOfert } from "../../redux/ofertsSlice";
 
-export const Products = () => {
+export const Products = ({ oferts }) => {
   const { id } = useParams();
-  const { searchOfert, allOferts } = useSelector((store) => store.oferts);
-  const filterOferts = allOferts
-    .filter((ofert) => ofert.product.category == id && ofert.stock.length > 0)
-    .sort((a, b) => {
-      if (a.description < b.description) {
-        return -1;
-      }
-      if (a.description > b.description) {
-        return 1;
-      }
-      return 0;
-    });
+
+  const { searchOfert } = useSelector((store) => store.oferts);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const filterOferts = oferts.filter(
+    (item) => item?.product?.category === id || item?.category === id
+  );
 
   return (
     <div className={styles.scroll}>
@@ -62,7 +56,10 @@ export const Products = () => {
                 key={ofert._id}
                 onClick={() => navigate(`/oferta/${ofert._id}`)}
               >
-                <img src={ofert.product.img} alt={ofert.product.name} />
+                <img
+                  src={ofert?.product?.img || ofert.img}
+                  alt={ofert?.product?.name || ofert.name}
+                />
                 <div className={styles.product_card_name}>
                   <h3>{ofert.description}</h3>
                 </div>

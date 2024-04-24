@@ -1,7 +1,7 @@
 import { apiSlice } from "./apiSlice";
 
 export const ofertApi = apiSlice.injectEndpoints({
-  keepUnusedDataFor: 10, // duración de datos en cache
+  keepUnusedDataFor: 60 * 2, // duración de datos en cache
   refetchOnMountOrArgChange: true, // revalida al montar el componente
   refetchOnFocus: true, // revalida al cambiar de foco
   refetchOnReconnect: true, // revalida al reconectar
@@ -23,7 +23,7 @@ export const ofertApi = apiSlice.injectEndpoints({
     }),
     getOfertQuery: builder.query({
       query: ({ id, stock }) => `/oferts/${id}?stock=${stock}`,
-      // keepUnusedDataFor: 3,
+      keepUnusedDataFor: 10,
       extraOptions: { maxRetries: 3 },
       providesTags: ["oferts"],
     }),
@@ -35,6 +35,12 @@ export const ofertApi = apiSlice.injectEndpoints({
     }),
     getOfertWithCategory: builder.query({
       query: () => `/oferts/categories`,
+      // keepUnusedDataFor: 3,
+      extraOptions: { maxRetries: 3 },
+      providesTags: ["oferts"],
+    }),
+    getOfertWithCategoryById: builder.query({
+      query: (id) => `/oferts/categories/${id}`,
       // keepUnusedDataFor: 3,
       extraOptions: { maxRetries: 3 },
       providesTags: ["oferts"],
@@ -57,5 +63,6 @@ export const {
   useGetOfertQueryQuery,
   useGetOfertByProductIdQuery,
   useGetOfertWithCategoryQuery,
+  useGetOfertWithCategoryByIdQuery,
   usePostOrderMutation,
 } = ofertApi;

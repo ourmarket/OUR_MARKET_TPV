@@ -7,7 +7,6 @@ import { addProduct } from "../../redux/orderSlice";
 import { clearSearchOfert, updateOfert } from "../../redux/ofertsSlice";
 import { formatQuantity } from "../../utils/formatQuantity";
 import { v4 as uuidv4 } from "uuid";
-import { updateStockFunction } from "../../utils/adjustStock";
 
 export const Stocks = ({ ofert, stock: stockActual }) => {
   const stocks = stockActual.reduce((acc, curr) => acc + curr.stock, 0);
@@ -32,7 +31,7 @@ export const Stocks = ({ ofert, stock: stockActual }) => {
       stockId: stock._id,
       maxStock: stocks,
       stock: stockActual,
-      stockModify: updateStockFunction(stockActual, 1),
+
       ofertId: ofert._id,
     };
 
@@ -45,7 +44,6 @@ export const Stocks = ({ ofert, stock: stockActual }) => {
     dispatch(
       updateOfert({
         id: ofert._id,
-        // stock: updateStockFunction(stock, 1), ya no lo necesito
       })
     );
     navigate("/");

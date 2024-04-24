@@ -24,7 +24,6 @@ import { AiOutlineDelete } from "react-icons/ai";
 import { GoNumber } from "react-icons/go";
 import { useNavigate } from "react-router-dom";
 import { BsTruck } from "react-icons/bs";
-import { calculateAverageUnityCost } from "../../utils/adjustStock";
 
 const Product = ({ product }) => {
   const { active } = useSelector((store) => store.order);
@@ -108,18 +107,9 @@ export const Ticket = () => {
         totalQuantity: item.totalQuantity,
         totalPrice: item.totalPrice,
         unitPrice: item.unitPrice,
-        unitCost: calculateAverageUnityCost(item.stockModify),
+        unitCost: 0,
         stockId: null,
-        stockData: item.stockModify
-          .filter((stock) => stock.quantity !== stock.stock)
-          .map((stock) => ({
-            stockId: stock._id,
-            quantityOriginal: stock.quantity,
-            quantityNew: stock.stock,
-            quantityModify: stock.modify,
-            unitCost: stock.unityCost,
-            dateStock: stock.createdAt,
-          })),
+        stockData: [],
       })),
 
       shippingAddress: {

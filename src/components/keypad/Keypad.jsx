@@ -13,14 +13,12 @@ import {
 } from "../../redux/ordersSlice";
 import Swal from "sweetalert2";
 import { GrClose } from "react-icons/gr";
-import { updateOfert } from "../../redux/ofertsSlice";
-import { adjustStock, updateStockFunction } from "../../utils/adjustStock";
 
 export const Keypad = () => {
   const { pathname } = useLocation();
   const { keypad_mode } = useSelector((store) => store.ui);
 
-  const { active, maxStock, products } = useSelector((store) => store.order);
+  const { active, maxStock } = useSelector((store) => store.order);
   const { activeProduct, selectOrder } = useSelector(
     (store) => store.ordersList
   );
@@ -80,21 +78,10 @@ export const Keypad = () => {
         });
       }
 
-      const modifyStock = adjustStock(
-        selectProductCashier[0].originalTotalQuantity,
-        displayNumber.value,
-        selectProductCashier[0].availableStock,
-        selectProductCashier[0].stockData,
-        selectProductCashier[0].originalUnitCost
-      );
-
       dispatch(
         updateQuantityActiveProduct({
           id: activeProduct,
           value: displayNumber.value,
-          unitCost: modifyStock.unitCost,
-          modifyStockData: modifyStock.modifyStock,
-          modifyAvailableStock: modifyStock.availableStock,
           visible: true,
         })
       );
@@ -108,10 +95,6 @@ export const Keypad = () => {
       );
     }
     if (keypad_mode === "quantity") {
-      const selectProduct = products.filter(
-        (product) => product.uniqueId === active
-      );
-
       if (maxStock && displayNumber.value > maxStock) {
         return Swal.fire({
           position: "center",
@@ -125,19 +108,6 @@ export const Keypad = () => {
         updateQuantityProduct({
           id: active,
           value: displayNumber.value,
-          stock: updateStockFunction(
-            selectProduct[0]?.stock,
-            displayNumber.value
-          ),
-        })
-      );
-      dispatch(
-        updateOfert({
-          id: selectProduct[0].ofertId,
-          stock: updateStockFunction(
-            selectProduct[0].stock,
-            displayNumber.value
-          ),
         })
       );
     }

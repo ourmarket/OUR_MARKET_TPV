@@ -121,14 +121,7 @@ export const CashOut = () => {
         unitPrice: product.unitPrice,
         unitCost: product.unitCost,
         stockId: null,
-        stockData: product.allStockData.map((stock) => ({
-          stockId: stock.stockId,
-          unitCost: stock.unitCost,
-          quantityOriginal: stock.quantity,
-          quantityNew: stock.stock,
-          quantityModify: stock.modify,
-          dateStock: stock.dateStock,
-        })),
+        stockData: product.stockData,
       })),
 
       shippingAddress: selectOrder.shippingAddress,
@@ -226,24 +219,26 @@ export const CashOut = () => {
               <h3>Total</h3>
             </div>
           </div>
-          {selectOrder.orderItems.map((product) => {
-            return (
-              <div className={styles.product} key={product._id}>
-                <div className={styles.col1}>
-                  <h3>{product.totalQuantity} unid.</h3>
+          {selectOrder.orderItems
+            .filter((item) => item.visible)
+            .map((product) => {
+              return (
+                <div className={styles.product} key={product._id}>
+                  <div className={styles.col1}>
+                    <h3>{product.totalQuantity} unid.</h3>
+                  </div>
+                  <div className={styles.col2}>
+                    <h3>{product.name}</h3>
+                  </div>
+                  <div className={styles.col3}>
+                    <h3>{formatPrice(product.unitPrice)}</h3>
+                  </div>
+                  <div className={styles.col4}>
+                    <h3>{formatPrice(product.totalPrice)}</h3>
+                  </div>
                 </div>
-                <div className={styles.col2}>
-                  <h3>{product.name}</h3>
-                </div>
-                <div className={styles.col3}>
-                  <h3>{formatPrice(product.unitPrice)}</h3>
-                </div>
-                <div className={styles.col4}>
-                  <h3>{formatPrice(product.totalPrice)}</h3>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
 
           <div className={styles.data}>
             <div className={styles.totals}>

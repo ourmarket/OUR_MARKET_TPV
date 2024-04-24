@@ -61,18 +61,20 @@ class Ticket extends React.Component {
 
           <div className="body-ticket">
             <div className="products">
-              {this.props.selectOrder.orderItems.map((product) => (
-                <div className="products__item" key={product._id}>
-                  <div>
-                    <p>
-                      {`${product.description}. (${
-                        product.totalQuantity
-                      } unid. x ${formatPrice(product.unitPrice)})`}
-                    </p>
+              {this.props.selectOrder.orderItems
+                .filter((item) => item.visible)
+                .map((product) => (
+                  <div className="products__item" key={product._id}>
+                    <div>
+                      <p>
+                        {`${product.description}. (${
+                          product.totalQuantity
+                        } unid. x ${formatPrice(product.unitPrice)})`}
+                      </p>
+                    </div>
+                    <p className="prix">{formatPrice(product.totalPrice)}</p>
                   </div>
-                  <p className="prix">{formatPrice(product.totalPrice)}</p>
-                </div>
-              ))}
+                ))}
             </div>
             <div className="hr-lg" />
             <div className="products__item">

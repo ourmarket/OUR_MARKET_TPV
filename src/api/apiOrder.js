@@ -47,7 +47,7 @@ export const orderApi = apiSlice.injectEndpoints({
         method: "post",
         body: newOrders,
       }),
-      invalidatesTags: ["orders"],
+      invalidatesTags: ["orders", "oferts"],
       extraOptions: { maxRetries: 0 },
     }),
 

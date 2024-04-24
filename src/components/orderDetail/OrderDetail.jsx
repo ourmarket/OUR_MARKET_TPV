@@ -18,7 +18,6 @@ import {
 import Swal from "sweetalert2";
 import { useDeleteOrderMutation } from "../../api/apiOrder";
 import { useEffect } from "react";
-import { adjustStock } from "../../utils/adjustStock";
 
 const Product = ({ product }) => {
   const { activeProduct } = useSelector((store) => store.ordersList);
@@ -75,25 +74,11 @@ export const OrderDetail = () => {
       confirmButtonText: "Borrar",
     }).then((result) => {
       if (result.isConfirmed) {
-        const selectProductCashier = selectOrder.orderItems.filter(
-          (product) => product.uniqueId === activeProduct
-        );
-
-        const modifyStock = adjustStock(
-          selectProductCashier[0].originalTotalQuantity,
-          0,
-          selectProductCashier[0].availableStock,
-          selectProductCashier[0].stockData,
-          selectProductCashier[0].originalUnitCost
-        );
-
         dispatch(
           updateQuantityActiveProduct({
             id: activeProduct,
             value: 0,
-            unitCost: modifyStock.unitCost,
-            modifyStockData: modifyStock.modifyStock,
-            modifyAvailableStock: modifyStock.availableStock,
+
             visible: false,
           })
         );

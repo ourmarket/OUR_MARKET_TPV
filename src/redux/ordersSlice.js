@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { mergeArrays } from "../utils/adjustStock";
 
 const ordersListSlice = createSlice({
   name: "ordersList",
@@ -49,52 +48,6 @@ const ordersListSlice = createSlice({
           originalTotalQuantity: product.totalQuantity,
           originalUnitCost: product.unitCost,
           visible: true,
-          // estos vienen de stockData
-          allStockData: product.stockData.map((stock) => ({
-            stockId: stock.stockId,
-            quantity: stock.quantityOriginal,
-            stock: stock.quantityNew,
-            modify: stock.quantityModify,
-            unitCost: stock.unitCost,
-            dateStock: stock.dateStock,
-          })),
-          modifyStockData: product.stockData.map((stock) => ({
-            stockId: stock.stockId,
-            quantity: stock.quantityOriginal,
-            stock: stock.quantityNew,
-            modify: stock.quantityModify,
-            unitCost: stock.unitCost,
-            dateStock: stock.dateStock,
-          })),
-          stockData: product.stockData.map((stock) => ({
-            stockId: stock.stockId,
-            quantity: stock.quantityOriginal,
-            stock: stock.quantityNew,
-            modify: stock.quantityModify,
-            unitCost: stock.unitCost,
-            dateStock: stock.dateStock,
-          })),
-
-          // estos vienen del stock de todos los productos de la orden
-          modifyAvailableStock: action.payload.stock
-            .filter((s) => s.product === product.productId)[0]
-            .stock.map((stock) => ({
-              stockId: stock?._id,
-              quantity: stock?.quantity,
-              stock: stock?.stock,
-              unitCost: stock?.unityCost,
-              dateStock: stock?.createdAt,
-            })),
-
-          availableStock: action.payload.stock
-            .filter((s) => s.product === product.productId)[0]
-            .stock.map((stock) => ({
-              stockId: stock?._id,
-              quantity: stock?.quantity,
-              stock: stock?.stock,
-              unitCost: stock?.unityCost,
-              dateStock: stock?.createdAt,
-            })),
         })),
       };
       state.orders = [...state.orders, newOrder];
@@ -108,45 +61,6 @@ const ordersListSlice = createSlice({
           originalTotalQuantity: product.totalQuantity,
           originalUnitCost: product.unitCost,
           visible: true,
-
-          allStockData: product.stockData.map((stock) => ({
-            stockId: stock.stockId,
-            quantity: stock.quantityOriginal,
-            stock: stock.quantityNew,
-            modify: stock.quantityModify,
-            unitCost: stock.unitCost,
-            dateStock: stock.dateStock,
-          })),
-          modifyStockData: product.stockData.map((stock) => ({
-            stockId: stock.stockId,
-            quantity: stock.quantityOriginal,
-            stock: stock.quantityNew,
-            modify: stock.quantityModify,
-            unitCost: stock.unitCost,
-            dateStock: stock.dateStock,
-          })),
-          stockData: product.stockData.map((stock) => ({
-            stockId: stock.stockId,
-            quantity: stock.quantityOriginal,
-            stock: stock.quantityNew,
-            modify: stock.quantityModify,
-            unitCost: stock.unitCost,
-            dateStock: stock.dateStock,
-          })),
-          modifyAvailableStock: product.stockAvailable.map((stock) => ({
-            stockId: stock._id,
-            quantity: stock.quantity,
-            stock: stock.stock,
-            unitCost: stock.unityCost,
-            dateStock: stock.createdAt,
-          })),
-          availableStock: product.stockAvailable.map((stock) => ({
-            stockId: stock._id,
-            quantity: stock.quantity,
-            stock: stock.stock,
-            unitCost: stock.unityCost,
-            dateStock: stock.createdAt,
-          })),
         })),
       }));
     },
@@ -176,17 +90,7 @@ const ordersListSlice = createSlice({
             ...product,
             totalPrice: +action.payload.value * product.unitPrice,
             totalQuantity: +action.payload.value,
-            unitCost: +action.payload.unitCost,
-            modifyStockData: action.payload.modifyStockData,
-            modifyAvailableStock: action.payload.modifyAvailableStock,
             visible: action.payload.visible,
-            allStockData:
-              product.originalTotalQuantity > +action.payload.totalQuantity
-                ? action.payload.modifyStockData
-                : mergeArrays(
-                    action.payload.modifyStockData,
-                    action.payload.modifyAvailableStock
-                  ),
           };
         } else {
           return product;
@@ -327,45 +231,6 @@ const ordersListSlice = createSlice({
         originalTotalQuantity: newProduct.totalQuantity,
         originalUnitCost: newProduct.unitCost,
         visible: true,
-
-        allStockData: newProduct.stock.map((stock) => ({
-          stockId: stock.stockId,
-          quantity: stock.quantityOriginal,
-          stock: stock.quantityNew,
-          modify: stock.quantityModify,
-          unitCost: stock.unitCost,
-          dateStock: stock.dateStock,
-        })),
-        modifyStockData: newProduct.stock.map((stock) => ({
-          stockId: stock.stockId,
-          quantity: stock.quantityOriginal,
-          stock: stock.quantityNew,
-          modify: stock.quantityModify,
-          unitCost: stock.unitCost,
-          dateStock: stock.dateStock,
-        })),
-        stockData: newProduct.stock.map((stock) => ({
-          stockId: stock.stockId,
-          quantity: stock.quantityOriginal,
-          stock: stock.quantityNew,
-          modify: stock.quantityModify,
-          unitCost: stock.unitCost,
-          dateStock: stock.dateStock,
-        })),
-        modifyAvailableStock: newProduct.stockAvailable.map((stock) => ({
-          stockId: stock._id,
-          quantity: stock.quantity,
-          stock: stock.stock,
-          unitCost: stock.unityCost,
-          dateStock: stock.createdAt,
-        })),
-        availableStock: newProduct.stockAvailable.map((stock) => ({
-          stockId: stock._id,
-          quantity: stock.quantity,
-          stock: stock.stock,
-          unitCost: stock.unityCost,
-          dateStock: stock.createdAt,
-        })),
       });
 
       const subTotal = productUpdate.reduce((acc, cur) => {
@@ -412,7 +277,6 @@ const ordersListSlice = createSlice({
 export const {
   addOrder,
   addOrders,
-
   addSelectOrder,
   clearSelectOrder,
   setActiveProduct,

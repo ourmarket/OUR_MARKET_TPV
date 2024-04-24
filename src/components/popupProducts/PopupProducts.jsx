@@ -53,13 +53,7 @@ export const PopupProducts = () => {
         <Navbar value={value} setValue={setValue} />
         {l1 && <Loading />}
         {e1 && <p>Ha ocurrido un error</p>}
-        {ofertsData && (
-          <ProductsList
-            oferts={ofertsData.data.oferts}
-            value={value}
-            ofertStock={data.data.oferts}
-          />
-        )}
+        {ofertsData && <ProductsList ofertStock={data.data.oferts} />}
       </div>
     </section>
   );
