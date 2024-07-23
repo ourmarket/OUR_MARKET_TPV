@@ -11,6 +11,7 @@ import { AiOutlinePrinter } from "react-icons/ai";
 export const Receipt = () => {
   let componentRef = useRef();
   const { selectOrder } = useSelector((store) => store.ordersList);
+  const { superUserData } = useSelector((store) => store.authDelivery);
   return (
     <div style={{ width: "50%" }}>
       {/* button to trigger printing of target component */}
@@ -26,7 +27,11 @@ export const Receipt = () => {
 
       {/* component to be printed */}
       <div style={{ display: "none" }}>
-        <Ticket ref={(el) => (componentRef = el)} selectOrder={selectOrder} />
+        <Ticket
+          ref={(el) => (componentRef = el)}
+          selectOrder={selectOrder}
+          superUserData={superUserData || null}
+        />
       </div>
     </div>
   );
@@ -38,9 +43,17 @@ class Ticket extends React.Component {
       <div className="container-ticket">
         <div className="ticket">
           <div className="head-ticket">
-            <p className="x-bold">Avícola Martina</p>
-            <p className="bold">San Miguel</p>
-            <p className="bold">Av.Balbin 4872</p>
+            <p className="x-bold">
+              {this.props.superUserData
+                ? this.props.superUserData.businessName
+                : ""}
+            </p>
+            <p className="bold">
+              {this.props.superUserData ? this.props.superUserData.city : ""}
+            </p>
+            <p className="bold">
+              {this.props.superUserData ? this.props.superUserData.address : ""}
+            </p>
 
             <br />
             <p className="bold">Ticket interno</p>
