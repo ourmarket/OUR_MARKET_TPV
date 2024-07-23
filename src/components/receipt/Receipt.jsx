@@ -11,7 +11,7 @@ import { AiOutlinePrinter } from "react-icons/ai";
 export const Receipt = () => {
   let componentRef = useRef();
   const { selectOrder } = useSelector((store) => store.ordersList);
-  const { superUserData } = useSelector((store) => store.authDelivery);
+  const { superUserData } = useSelector((store) => store.auth);
   return (
     <div style={{ width: "50%" }}>
       {/* button to trigger printing of target component */}
