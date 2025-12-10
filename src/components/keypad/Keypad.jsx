@@ -19,9 +19,12 @@ export const Keypad = () => {
   const { keypad_mode } = useSelector((store) => store.ui);
 
   const { active, maxStock } = useSelector((store) => store.order);
-  const { activeProduct, selectOrder } = useSelector(
-    (store) => store.ordersList
-  );
+  const {
+    activeProduct,
+    selectOrder,
+    activeProductUnitPrice,
+    activeProductCost,
+  } = useSelector((store) => store.ordersList);
 
   const [displayNumber, setDisplayNumber] = useState({
     acc: [],
@@ -87,13 +90,54 @@ export const Keypad = () => {
       );
     }
     if (pathname === "/caja" && keypad_mode === "price") {
+      const value = Number(displayNumber.value);
+      const minSevenPercent = activeProductUnitPrice * 0.85;
+      const maxSevenPercent = activeProductUnitPrice * 1.3;
+
+      // PREVENT: precio menor al costo
+      if (value < activeProductCost) {
+        return Swal.fire({
+          position: "center",
+          icon: "error",
+          title: `El precio no puede ser menor al costo ($${activeProductCost})`,
+          showConfirmButton: true,
+          confirmButtonColor: "#d33",
+        });
+      }
+
+      // PREVENT: precio menor al 7% del precio unitario
+      if (value < minSevenPercent) {
+        return Swal.fire({
+          position: "center",
+          icon: "error",
+          title: `El precio no puede ser menor al 15% del precio unitario ($${minSevenPercent.toFixed(
+            2
+          )})`,
+          showConfirmButton: true,
+          confirmButtonColor: "#d33",
+        });
+      }
+      // PREVENT: precio mayor al 30% del precio unitario
+      if (value > maxSevenPercent) {
+        return Swal.fire({
+          position: "center",
+          icon: "error",
+          title: `El precio no puede ser mayor al 30% del precio unitario ($${maxSevenPercent.toFixed(
+            2
+          )})`,
+          showConfirmButton: true,
+          confirmButtonColor: "#d33",
+        });
+      }
+
       dispatch(
         updatePriceActiveProduct({
           id: activeProduct,
-          value: displayNumber.value,
+          value,
         })
       );
     }
+
     if (keypad_mode === "quantity") {
       if (maxStock && displayNumber.value > maxStock) {
         return Swal.fire({

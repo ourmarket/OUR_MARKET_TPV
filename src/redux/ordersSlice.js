@@ -7,6 +7,8 @@ const ordersListSlice = createSlice({
     selectOrder: null,
 
     activeProduct: null,
+    activeProductUnitPrice: null,
+    activeProductCost: null,
     payment: {
       cash: 0,
       transfer: 0,
@@ -60,6 +62,7 @@ const ordersListSlice = createSlice({
           ...product,
           originalTotalQuantity: product.totalQuantity,
           originalUnitCost: product.unitCost,
+          originalUnitPrice: product.unitPrice,
           visible: true,
         })),
       }));
@@ -77,7 +80,9 @@ const ordersListSlice = createSlice({
       state.selectOrderOriginalItems = null;
     },
     setActiveProduct: (state, action) => {
-      state.activeProduct = action.payload;
+      state.activeProduct = action.payload.product;
+      state.activeProductUnitPrice = action.payload.unitPrice;
+      state.activeProductCost = action.payload.cost;
     },
     clearActiveProduct: (state) => {
       state.activeProduct = null;
@@ -267,6 +272,8 @@ const ordersListSlice = createSlice({
     clearOrdersList: (state, action) => {
       state.selectOrder = null;
       state.activeProduct = null;
+      activeProductUnitPrice= null;
+      activeProductCost= null;
       state.orders = state.orders.filter(
         (order) => order._id !== action.payload
       );
