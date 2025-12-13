@@ -27,7 +27,7 @@ const Product = ({ product }) => {
       dispatch(clearActiveProduct());
     } else {
       dispatch(clearActiveProduct());
-      dispatch(setActiveProduct({product: product.uniqueId, unitPrice: product.originalUnitPrice, cost: product.unitCost}));
+      dispatch(setActiveProduct(product.uniqueId));
     }
   };
 
