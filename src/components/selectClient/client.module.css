@@ -64,7 +64,7 @@
 }
 .client_box input {
   width: 100%;
-  padding: 15px;
+  padding: 15px 95px 15px 15px;
   font-size: 18px;
   outline-color: #8e8e8e;
   border-radius: 10px;
@@ -193,4 +193,48 @@
   padding: 0;
   border: none;
   outline: none;
+}
+
+.btn_refresh {
+  position: absolute;
+  right: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #05839b;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 22px;
+  padding: 5px;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.btn_refresh:hover:not(:disabled) {
+  color: #046b7f;
+  transform: translateY(-50%) scale(1.15);
+}
+
+.btn_refresh:active:not(:disabled) {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.btn_refresh:disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
 }

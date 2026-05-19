@@ -6,6 +6,7 @@ import { closeLocalOrder } from "../../redux/uiSlice";
 import { QRCodeSVG } from "qrcode.react";
 import { useLazyGetClientQuery, useLazyGetClientsQuery } from "../../api/apiClient";
 import { getAllClients } from "../../redux/clientsSlice";
+import { FiRefreshCw, FiCopy, FiShare2 } from "react-icons/fi";
 
 export const Local = () => {
   const dispatch = useDispatch();
@@ -23,6 +24,30 @@ export const Local = () => {
 
   const [value, setValue] = useState("");
   const [selectClient, setSelectClient] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    const url = `${window.location.origin}/#/client-register?link=${selectClient._id}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }).catch(console.error);
+  };
+
+  const handleRefreshClients = async () => {
+    setIsRefreshing(true);
+    try {
+      const res = await fetchClients().unwrap();
+      if (res?.data?.clients) {
+        dispatch(getAllClients(res.data.clients));
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const handleVerify = async () => {
     if (selectClient?._id) {
@@ -72,6 +97,15 @@ export const Local = () => {
             onChange={onChange}
             autoFocus
           />
+          <button 
+            type="button" 
+            className={styles.btn_refresh} 
+            onClick={handleRefreshClients}
+            disabled={isRefreshing}
+            title="Actualizar clientes"
+          >
+            <FiRefreshCw className={isRefreshing ? styles.spinning : ""} />
+          </button>
           <button className={styles.bnt_reset} onClick={onReset}>
             X
           </button>
@@ -145,8 +179,9 @@ export const Local = () => {
                     value={`${window.location.origin}/#/client-register?link=${selectClient._id}`} 
                     size={120} 
                   />
-                  <div style={{ marginTop: "15px" }}>
+                  <div style={{ marginTop: "15px", display: "flex", justifyContent: "center", gap: "10px", flexWrap: "wrap" }}>
                     <button 
+                      type="button"
                       onClick={handleVerify}
                       disabled={isFetching}
                       style={{
@@ -157,11 +192,64 @@ export const Local = () => {
                         borderRadius: "4px",
                         cursor: isFetching ? "not-allowed" : "pointer",
                         fontSize: "13px",
-                        opacity: isFetching ? 0.7 : 1
+                        opacity: isFetching ? 0.7 : 1,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px"
                       }}
                     >
                       {isFetching ? "Verificando..." : "Ya escaneé el código"}
                     </button>
+
+                    <button 
+                      type="button"
+                      onClick={handleCopyLink}
+                      style={{
+                        backgroundColor: copied ? "#2e7d32" : "#e0e0e0",
+                        color: copied ? "white" : "#333",
+                        border: "none",
+                        padding: "8px 16px",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                        fontSize: "13px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        transition: "background-color 0.3s ease, color 0.3s ease"
+                      }}
+                    >
+                      <FiCopy />
+                      {copied ? "¡Copiado!" : "Copiar enlace"}
+                    </button>
+
+                    {selectClient?.user?.phone && (
+                      <a
+                        href={`https://wa.me/${selectClient.user.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                          `¡Hola! Para validar tu cuenta en nuestro local y acceder a los beneficios, por favor ingresa aquí con Google: ${window.location.origin}/#/client-register?link=${selectClient._id}`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          backgroundColor: "#25d366",
+                          color: "white",
+                          border: "none",
+                          padding: "8px 16px",
+                          borderRadius: "4px",
+                          cursor: "pointer",
+                          fontSize: "13px",
+                          textDecoration: "none",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          transition: "opacity 0.2s ease"
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.opacity = 0.9}
+                        onMouseLeave={(e) => e.currentTarget.style.opacity = 1}
+                      >
+                        <FiShare2 />
+                        WhatsApp
+                      </a>
+                    )}
                   </div>
                 </div>
               )}
