@@ -1,0 +1,59 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f4f7f6;
+  padding: 20px;
+}
+
+.card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 40px 30px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.logo {
+  max-width: 150px;
+  margin-bottom: 20px;
+}
+
+.card h2 {
+  color: #333;
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 15px;
+  line-height: 1.5;
+  margin-bottom: 30px;
+}
+
+.googleBtnContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.successBox {
+  background-color: #e8f5e9;
+  border: 1px solid #c8e6c9;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.successBox h3 {
+  color: #2e7d32;
+  margin-bottom: 10px;
+}
+
+.successBox p {
+  color: #1b5e20;
+}

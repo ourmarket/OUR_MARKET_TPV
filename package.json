@@ -10,11 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-oauth/google": "^0.13.5",
     "@reduxjs/toolkit": "^1.9.5",
     "@tanstack/react-table": "^8.10.7",
     "axios": "^1.4.0",
     "formik": "^2.4.2",
     "moment-timezone": "^0.5.43",
+    "qrcode.react": "^4.2.0",
     "react": "^18.2.0",
     "react-barcode": "^1.4.6",
     "react-dom": "^18.2.0",

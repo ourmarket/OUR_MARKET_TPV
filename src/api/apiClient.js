@@ -24,4 +24,4 @@ export const clientApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useGetClientsQuery, useGetClientQuery } = clientApi;
+export const { useGetClientsQuery, useLazyGetClientsQuery, useGetClientQuery, useLazyGetClientQuery } = clientApi;

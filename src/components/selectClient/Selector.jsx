@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import styles from "./client.module.css";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { QRCodeSVG } from "qrcode.react";
 import {
   closeSelector,
   openDeliveryOrder,
@@ -9,10 +10,14 @@ import {
 
 export const Selector = () => {
   const dispatch = useDispatch();
+  const { superUser } = useSelector((store) => store.auth);
+  const [showQR, setShowQR] = useState(false);
+  const registerUrl = `${window.location.origin}/#/client-register?tenant=${superUser}`;
 
   const handleKeyPress = (event) => {
     if (event.key === "Escape") {
-      dispatch(closeSelector());
+      if (showQR) setShowQR(false);
+      else dispatch(closeSelector());
     }
   };
 
@@ -23,32 +28,60 @@ export const Selector = () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [showQR]);
 
   return (
     <section className={styles.container}>
       <div className={styles.client_box_selector}>
         <button
           className={styles.bnt_close}
-          onClick={() => dispatch(closeSelector())}
+          onClick={() => {
+            if (showQR) setShowQR(false);
+            else dispatch(closeSelector());
+          }}
         >
           x
         </button>
-        <div className={styles.btn_container}>
-          <h2>Selecciona el tipo de orden</h2>
-          <button
-            className={styles.btn_select_order}
-            onClick={() => dispatch(openDeliveryOrder())}
-          >
-            Orden de reparto
-          </button>
-          <button
-            className={styles.btn_select_order}
-            onClick={() => dispatch(openLocalOrder())}
-          >
-            Orden local
-          </button>
-        </div>
+
+        {showQR ? (
+          <div style={{ textAlign: "center", padding: "20px" }}>
+            <h2>Registrar Nuevo Cliente</h2>
+            <p style={{ marginBottom: "20px" }}>Pide al cliente que escanee este código QR</p>
+            <QRCodeSVG value={registerUrl} size={200} />
+            <div style={{ marginTop: "20px" }}>
+              <button 
+                className={styles.btn_select_order} 
+                onClick={() => setShowQR(false)}
+              >
+                Volver
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className={styles.btn_container}>
+            <h2>Selecciona el tipo de orden</h2>
+            <button
+              className={styles.btn_select_order}
+              onClick={() => dispatch(openDeliveryOrder())}
+            >
+              Orden de reparto
+            </button>
+            <button
+              className={styles.btn_select_order}
+              onClick={() => dispatch(openLocalOrder())}
+            >
+              Orden local
+            </button>
+            <div style={{ margin: "10px 0", borderTop: "1px solid #ccc" }}></div>
+            <button
+              className={styles.btn_select_order}
+              style={{ backgroundColor: "#2e7d32" }}
+              onClick={() => setShowQR(true)}
+            >
+              NUEVO CLIENTE
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
