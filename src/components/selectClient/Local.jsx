@@ -134,7 +134,7 @@ export const Local = () => {
             </div>
             <div className={styles.field} style={{ flexDirection: "column", alignItems: "flex-start" }}>
               <span>Email</span>
-              {selectClient.user.google || selectClient.user.verified ? (
+              {selectClient.user.google ? (
                 <p style={{ marginTop: "5px" }}>{selectClient.user.email}</p>
               ) : (
                 <div style={{ marginTop: "10px", textAlign: "center", width: "100%", padding: "10px", backgroundColor: "#f9f9f9", borderRadius: "8px" }}>
