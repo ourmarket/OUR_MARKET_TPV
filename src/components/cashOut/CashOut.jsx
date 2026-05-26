@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import styles from "./cashOut.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -14,6 +14,7 @@ import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai";
 import { formatPrice } from "../../utils/formatPrice";
 import { Receipt } from "../receipt/Receipt";
 import { usePutOrderMutation } from "../../api/apiOrder";
+import { useGetClientQuery, useGetConfigQuery } from "../../api/apiClient";
 import Swal from "sweetalert2";
 import {
   clearOrdersList,
@@ -38,6 +39,26 @@ export const CashOut = () => {
   const [updateSession, { isLoading: l3, isError: e3 }] =
     usePutCashierSessionMutation();
 
+  // --- LÓGICA DE CANJE DE PUNTOS ---
+  const [usePoints, setUsePoints] = useState(false);
+
+  // Obtener puntos más recientes de este cliente
+  const { data: clientResponse } = useGetClientQuery(selectOrder?.client?._id, {
+    skip: !selectOrder?.client?._id,
+  });
+  const clientPoints = clientResponse?.data?.client?.points || 0;
+
+  // Obtener tasa de canje configurada en el sistema
+  const { data: configResponse } = useGetConfigQuery();
+  const conversionRate = configResponse?.config?.pointsConversionRate || 10;
+
+  // Calcular descuento equivalente y puntos a utilizar (sin exceder el total de la orden)
+  const pointsDiscount = usePoints ? Math.min(clientPoints / conversionRate, selectOrder.total) : 0;
+  const pointsUsed = usePoints ? Math.min(clientPoints, selectOrder.total * conversionRate) : 0;
+
+  const finalTotal = selectOrder.total - pointsDiscount;
+  // ---------------------------------
+
   const handleKeyPress = (event) => {
     if (event.key === "Escape") {
       dispatch(closeCashOut());
@@ -53,21 +74,21 @@ export const CashOut = () => {
   }, []);
 
   const handlerCash = () => {
-    const rest = selectOrder.subTotal - payment.transfer - payment.debt;
+    const rest = finalTotal - payment.transfer - payment.debt;
     dispatch(setCash(rest));
   };
   const handlerTransfer = () => {
-    const rest = selectOrder.subTotal - payment.cash - payment.debt;
+    const rest = finalTotal - payment.cash - payment.debt;
     dispatch(setTransfer(rest));
   };
   const handlerDebt = () => {
-    const rest = selectOrder.subTotal - payment.transfer - payment.cash;
+    const rest = finalTotal - payment.transfer - payment.cash;
 
     dispatch(setDebt(rest));
   };
 
   const handleConfirmOrder = async () => {
-    if (+payment.cash + +payment.transfer + +payment.debt > selectOrder.total) {
+    if (+payment.cash + +payment.transfer + +payment.debt > finalTotal) {
       return Swal.fire({
         position: "center",
         icon: "error",
@@ -78,7 +99,7 @@ export const CashOut = () => {
         confirmButtonColor: "#d33",
       });
     }
-    if (+payment.cash + +payment.transfer + +payment.debt === 0) {
+    if (+payment.cash + +payment.transfer + +payment.debt === 0 && finalTotal > 0) {
       return Swal.fire({
         position: "center",
         icon: "error",
@@ -89,7 +110,7 @@ export const CashOut = () => {
     }
     if (
       +payment.cash + +payment.transfer + +payment.debt !==
-      +selectOrder.total
+      +finalTotal
     ) {
       return Swal.fire({
         position: "center",
@@ -132,7 +153,7 @@ export const CashOut = () => {
       numberOfItems: selectOrder.numberOfItems,
       tax: selectOrder.tax,
       subTotal: selectOrder.subTotal,
-      total: selectOrder.total,
+      total: finalTotal, // Enviamos el total final ajustado con descuento
 
       status: "Entregado", // Entregado
       active: false, //solo si es de reparto
@@ -145,8 +166,10 @@ export const CashOut = () => {
         debt: +payment.debt,
       },
 
-      paid: +payment.cash + +payment.transfer === selectOrder.total,
-      discount: 0,
+      paid: +payment.cash + +payment.transfer === finalTotal,
+      discount: pointsDiscount,
+      pointsUsed: pointsUsed,
+      pointsDiscount: pointsDiscount,
 
       deliveryDate: new Date(),
 
@@ -246,6 +269,56 @@ export const CashOut = () => {
                 <h3>Cliente</h3>
                 <h3>{`${selectOrder.shippingAddress.name} ${selectOrder.shippingAddress.lastName}`}</h3>
               </div>
+
+              {/* Módulo visual de canje de puntos de fidelidad */}
+              {selectOrder.client && (
+                <div 
+                  className={styles.row} 
+                  style={{ 
+                    backgroundColor: "rgba(0, 150, 136, 0.08)", 
+                    borderRadius: "8px", 
+                    padding: "10px 14px", 
+                    margin: "8px 0",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    gap: "6px",
+                    width: "100%"
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center" }}>
+                    <span style={{ fontSize: "14px", fontWeight: "700", color: "#00796b" }}>
+                      Puntos Disponibles: {clientPoints} pts
+                    </span>
+                    {clientPoints > 0 && (
+                      <span style={{ fontSize: "13px", color: "#444", fontWeight: "600" }}>
+                        (Equivale a -{formatPrice(clientPoints / conversionRate)})
+                      </span>
+                    )}
+                  </div>
+                  
+                  {clientPoints > 0 ? (
+                    <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", width: "100%", fontSize: "14px", fontWeight: "500", marginTop: "2px" }}>
+                      <input 
+                        type="checkbox" 
+                        checked={usePoints} 
+                        onChange={(e) => {
+                          setUsePoints(e.target.checked);
+                          // Limpiamos los pagos cargados para evitar montos descuadrados tras aplicar el descuento
+                          dispatch(clearPayment());
+                        }}
+                        style={{ width: "18px", height: "18px", cursor: "pointer" }}
+                      />
+                      <span style={{ color: "#333" }}>Canjear puntos en esta compra</span>
+                    </label>
+                  ) : (
+                    <div style={{ fontSize: "12.5px", color: "#555", fontStyle: "italic", marginTop: "2px", fontWeight: "500" }}>
+                      ¡Este cliente acumulará puntos con el pago de esta compra!
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className={styles.row}>
                 <h3>Subtotal</h3>
                 <h3>{formatPrice(selectOrder.subTotal)}</h3>
@@ -254,12 +327,18 @@ export const CashOut = () => {
                 <h3>Envío</h3>
                 <h3>{formatPrice(selectOrder.tax)}</h3>
               </div>
+              {pointsDiscount > 0 && (
+                <div className={styles.row} style={{ color: "green", fontWeight: "bold" }}>
+                  <h3>Descuento Puntos</h3>
+                  <h3>-{formatPrice(pointsDiscount)}</h3>
+                </div>
+              )}
               <div
                 className={styles.row}
                 style={{ fontSize: "30px", letterSpacing: "3px" }}
               >
                 <h3>Total</h3>
-                <h3>{formatPrice(selectOrder.total)}</h3>
+                <h3>{formatPrice(finalTotal)}</h3>
               </div>
             </div>
             <div className={styles.data_entry}>

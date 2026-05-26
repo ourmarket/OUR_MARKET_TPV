@@ -21,7 +21,18 @@ export const clientApi = apiSlice.injectEndpoints({
       extraOptions: { maxRetries: 3 },
       providesTags: ["clients"],
     }),
+
+    getConfig: builder.query({
+      query: () => "/config",
+      providesTags: ["config"],
+    }),
   }),
 });
 
-export const { useGetClientsQuery, useLazyGetClientsQuery, useGetClientQuery, useLazyGetClientQuery } = clientApi;
+export const {
+  useGetClientsQuery,
+  useLazyGetClientsQuery,
+  useGetClientQuery,
+  useLazyGetClientQuery,
+  useGetConfigQuery,
+} = clientApi;
