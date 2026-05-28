@@ -12,7 +12,8 @@ export const Selector = () => {
   const dispatch = useDispatch();
   const { superUser } = useSelector((store) => store.auth);
   const [showQR, setShowQR] = useState(false);
-  const registerUrl = `${window.location.origin}/#/client-register?tenant=${superUser}`;
+  const autogestionUrl = import.meta.env.VITE_APP_AUTOGESTION_URL || "http://localhost:5173";
+  const registerUrl = `${autogestionUrl}/?tenant=${superUser}`;
 
   const handleKeyPress = (event) => {
     if (event.key === "Escape") {

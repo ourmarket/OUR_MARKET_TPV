@@ -28,7 +28,8 @@ export const Local = () => {
   const [copied, setCopied] = useState(false);
 
   const handleCopyLink = () => {
-    const url = `${window.location.origin}/#/client-register?link=${selectClient._id}`;
+    const autogestionUrl = import.meta.env.VITE_APP_AUTOGESTION_URL || "http://localhost:5173";
+    const url = `${autogestionUrl}/?link=${selectClient._id}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -176,7 +177,7 @@ export const Local = () => {
                     Cuenta no vinculada. Escanea para vincular con Google:
                   </p>
                   <QRCodeSVG 
-                    value={`${window.location.origin}/#/client-register?link=${selectClient._id}`} 
+                    value={`${import.meta.env.VITE_APP_AUTOGESTION_URL || "http://localhost:5173"}/?link=${selectClient._id}`} 
                     size={120} 
                   />
                   <div style={{ marginTop: "15px", display: "flex", justifyContent: "center", gap: "10px", flexWrap: "wrap" }}>
@@ -225,7 +226,7 @@ export const Local = () => {
                     {selectClient?.user?.phone && (
                       <a
                         href={`https://wa.me/${selectClient.user.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
-                          `¡Hola! Para validar tu cuenta en nuestro local y acceder a los beneficios, por favor ingresa aquí con Google: ${window.location.origin}/#/client-register?link=${selectClient._id}`
+                          `¡Hola! Para validar tu cuenta en nuestro local y acceder a los beneficios, por favor ingresa aquí con Google: ${import.meta.env.VITE_APP_AUTOGESTION_URL || "http://localhost:5173"}/?link=${selectClient._id}`
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"

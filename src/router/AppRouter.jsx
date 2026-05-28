@@ -4,7 +4,6 @@ import { HomePage } from "../pages/HomePage";
 import { ProductsPage } from "../pages/ProductsPage";
 import { CashierPage } from "../pages/CashierPage";
 import { StocksPage } from "../pages/StocksPage";
-import { ClientRegisterPage } from "../pages/ClientRegisterPage";
 import PersistLogin from "./PersitRouter";
 import RequireAuth from "./RequiereAuth";
 import { ResumePage } from "../pages/ResumePage";
@@ -14,7 +13,6 @@ export const AppRouter = () => {
     <HashRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/client-register" element={<ClientRegisterPage />} />
 
         <Route element={<PersistLogin />}>
           <Route element={<RequireAuth />}>
