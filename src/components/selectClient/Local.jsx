@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import styles from "./client.module.css";
 import { useState, useEffect } from "react";
-import { addClient } from "../../redux/orderSlice";
+import { addClient, clearClient } from "../../redux/orderSlice";
 import { closeLocalOrder } from "../../redux/uiSlice";
 import { QRCodeSVG } from "qrcode.react";
 import { useLazyGetClientQuery, useLazyGetClientsQuery } from "../../api/apiClient";
@@ -80,6 +80,12 @@ export const Local = () => {
     dispatch(addClient(selectClient));
     dispatch(closeLocalOrder());
   };
+
+  const handleConsumidorFinal = () => {
+    dispatch(clearClient());
+    dispatch(closeLocalOrder());
+  };
+
   return (
     <section className={styles.container}>
       <div className={styles.client_box}>
@@ -90,6 +96,24 @@ export const Local = () => {
           x
         </button>
         <h2>Orden local</h2>
+        <div style={{ textAlign: "center", marginBottom: "10px" }}>
+          <button
+            type="button"
+            onClick={handleConsumidorFinal}
+            style={{
+              backgroundColor: "#f5f5f5",
+              color: "#05839b",
+              border: "1px solid #05839b",
+              borderRadius: "4px",
+              padding: "6px 14px",
+              fontSize: "13px",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+          >
+            Venta a Consumidor Final (sin cliente)
+          </button>
+        </div>
         <div className={styles.input_container}>
           <input
             type="text"

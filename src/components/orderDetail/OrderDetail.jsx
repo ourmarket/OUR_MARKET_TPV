@@ -174,8 +174,8 @@ export const OrderDetail = () => {
             <div className={styles.flex} style={{ padding: "10px" }}>
               <h4>Cliente:</h4>
               <h4>
-                {selectOrder.shippingAddress?.name}{" "}
-                {selectOrder.shippingAddress?.lastName}
+                {selectOrder.shippingAddress?.name || "Consumidor"}{" "}
+                {selectOrder.shippingAddress?.lastName || "Final"}
               </h4>
             </div>
           )}

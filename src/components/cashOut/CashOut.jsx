@@ -108,6 +108,16 @@ export const CashOut = () => {
         confirmButtonColor: "#d33",
       });
     }
+    if (+payment.debt > 0 && !selectOrder.client) {
+      return Swal.fire({
+        position: "center",
+        icon: "error",
+        title: "No se puede dejar deuda a Consumidor Final",
+        text: "Para registrar un saldo en DEUDA, la orden debe estar asignada a un cliente registrado.",
+        showConfirmButton: true,
+        confirmButtonColor: "#d33",
+      });
+    }
     if (
       +payment.cash + +payment.transfer + +payment.debt !==
       +finalTotal
@@ -125,8 +135,8 @@ export const CashOut = () => {
     const order = {
       userCashier: user, // id del usuario cajero
       userSeller: selectOrder.userSeller,
-      client: selectOrder.client._id,
-      userId: selectOrder.userId._id,
+      client: selectOrder.client?._id || selectOrder.client || null,
+      userId: selectOrder.userId?._id || selectOrder.userId || null,
       cashierMode: false, // cambiamos a false porque va a db definitivamente
       receiptId: selectOrder?.receiptId,
 
@@ -267,7 +277,7 @@ export const CashOut = () => {
             <div className={styles.totals}>
               <div className={styles.row}>
                 <h3>Cliente</h3>
-                <h3>{`${selectOrder.shippingAddress.name} ${selectOrder.shippingAddress.lastName}`}</h3>
+                <h3>{`${selectOrder.shippingAddress?.name || "Consumidor"} ${selectOrder.shippingAddress?.lastName || "Final"}`}</h3>
               </div>
 
               {/* Módulo visual de canje de puntos de fidelidad */}

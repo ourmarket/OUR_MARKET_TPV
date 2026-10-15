@@ -26,7 +26,7 @@ const Order = ({ order }) => {
       <h3 className={styles.col1}>{formatDateToHour(order?.createdAt)}hs</h3>
       <h3
         className={styles.col2}
-      >{`${order?.shippingAddress?.name} ${order?.shippingAddress?.lastName}`}</h3>
+      >{`${order?.shippingAddress?.name || "Consumidor"} ${order?.shippingAddress?.lastName || "Final"}`}</h3>
       <h3 className={styles.col3}>
         {order?.numberOfItems}{" "}
         {order?.numberOfItems === 1 ? "producto" : "productos"}

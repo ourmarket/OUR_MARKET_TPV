@@ -9,8 +9,10 @@ import {
   openSelector,
 } from "../../redux/uiSlice";
 import {
+  addDeliveryTruck,
   clearActiveProduct,
   clearCart,
+  clearClient,
   deleteProduct,
   setActiveProduct,
 } from "../../redux/orderSlice";
@@ -88,11 +90,12 @@ export const Ticket = () => {
   };
 
   const handleSendOrder = async () => {
+    const isConsumidorFinal = !client;
     const order = {
       userCashier: deliveryTruck ? user : null, // id del usuario cajero
       userSeller: user, // id del usuario vendedor
-      client: deliveryTruck ? client.client._id : client._id, //Id del cliente o id de la direccion
-      userId: client.user._id,
+      client: client ? (deliveryTruck ? client.client?._id || client._id : client._id) : null, // Id del cliente o null
+      userId: client?.user?._id || null,
       cashierMode: !deliveryTruck ? true : false, // para ser vista por el cajero al buscar en db
       receiptId: Date.now(),
 
@@ -114,10 +117,10 @@ export const Ticket = () => {
 
       shippingAddress: {
         addressId: shippingAddress?.addressId || null,
-        name: client.user.name,
-        lastName: client.user.lastName,
-        phone: client.user.phone,
-        address: shippingAddress?.address || null,
+        name: client?.user?.name || "Consumidor",
+        lastName: client?.user?.lastName || "Final",
+        phone: client?.user?.phone || null,
+        address: shippingAddress?.address || (isConsumidorFinal ? "Venta en local" : null),
         flor: shippingAddress?.flor || null,
         department: shippingAddress?.department || null,
         city: shippingAddress?.city || null,
@@ -155,7 +158,9 @@ export const Ticket = () => {
 
       //datos que no va a DB
       orderId: uuidv4(),
-      clientFullName: `${client.user.name} ${client.user.lastName}`,
+      clientFullName: client
+        ? `${client.user?.name || ""} ${client.user?.lastName || ""}`.trim()
+        : "Consumidor Final",
       date: new Date(),
     };
     console.log(order);
@@ -236,34 +241,66 @@ export const Ticket = () => {
 
         <div className={styles.client}>
           {client && deliveryTruck && (
-            <div
-              className={styles.flex}
-              style={{ padding: "10px" }}
-              onClick={() => dispatch(openDeliveryOrder())}
-            >
-              <h4 style={{ fontSize: "20px" }}>Cliente:</h4>
-              <h4>{`${client.user.name} ${client.user.lastName}`}</h4>
+            <div className={styles.client_cf}>
+              <div
+                style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+                onClick={() => dispatch(openDeliveryOrder())}
+                title="Click para cambiar datos de reparto"
+              >
+                <h4 style={{ fontSize: "17px", margin: 0 }}>Cliente:</h4>
+                <h4 style={{ margin: 0 }}>{`${client.user?.name || ""} ${client.user?.lastName || ""}`}</h4>
+              </div>
+              <button
+                type="button"
+                className={styles.btn_remove_client}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch(clearClient());
+                  dispatch(addDeliveryTruck(null));
+                }}
+                title="Quitar cliente y volver a Consumidor Final"
+              >
+                Quitar
+              </button>
             </div>
           )}
           {client && !deliveryTruck && (
-            <div
-              className={styles.flex}
-              style={{ padding: "10px" }}
-              onClick={() => dispatch(openLocalOrder())}
-            >
-              <h4 style={{ fontSize: "20px" }}>Cliente:</h4>
-              <h4>{`${client.user.name} ${client.user.lastName}`}</h4>
+            <div className={styles.client_cf}>
+              <div
+                style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+                onClick={() => dispatch(openLocalOrder())}
+                title="Click para cambiar cliente"
+              >
+                <h4 style={{ fontSize: "17px", margin: 0 }}>Cliente:</h4>
+                <h4 style={{ margin: 0 }}>{`${client.user?.name || ""} ${client.user?.lastName || ""}`}</h4>
+              </div>
+              <button
+                type="button"
+                className={styles.btn_remove_client}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch(clearClient());
+                }}
+                title="Quitar cliente y volver a Consumidor Final"
+              >
+                Quitar
+              </button>
             </div>
           )}
           {!client && (
-            <div
-              className={styles.client_empty}
-              onClick={() => dispatch(openSelector())}
-            >
-              <p>⚠ Se debe cargar un cliente </p>
-              <p className={styles.client_empty_text}>
-                (click aquí para cargar)
-              </p>
+            <div className={styles.client_cf}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <h4 style={{ fontSize: "17px", margin: 0 }}>Cliente:</h4>
+                <span className={styles.badge_cf}>Consumidor Final</span>
+              </div>
+              <button
+                type="button"
+                className={styles.btn_assign_client}
+                onClick={() => dispatch(openSelector())}
+                title="Asignar un cliente registrado o entrega"
+              >
+                + Asignar
+              </button>
             </div>
           )}
         </div>
@@ -286,18 +323,11 @@ export const Ticket = () => {
           </div>
         </div>
         <div className={styles.footer}>
-          {/* <button
-            className={styles.ticket_btn_send}
-            onClick={handleSendOrder}
-            disabled={!products || !client}
-          >
-            Enviar a caja
-          </button> */}
           <button
             className={`btn-load ${l1 ? "button--loading" : ""}`}
             type="submit"
             onClick={handleSendOrder}
-            disabled={!products || !client || l1}
+            disabled={!products || products.length === 0 || l1}
             style={{ width: "50%", padding: "20px" }}
           >
             <span className="button__text">Enviar</span>

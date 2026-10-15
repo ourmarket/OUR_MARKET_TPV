@@ -92,7 +92,7 @@ export const Resume = ({ data }) => {
     data: data.map((order) => ({
       ...order,
       deliveryDate: dateToLocalDate(order.deliveryDate),
-      client: `${order.shippingAddress.name} ${order.shippingAddress.lastName}`,
+      client: `${order.shippingAddress?.name || "Consumidor"} ${order.shippingAddress?.lastName || "Final"}`,
       total: formatPrice(order.total),
       cash: formatPrice(order.payment.cash),
       transfer: formatPrice(order.payment.transfer),

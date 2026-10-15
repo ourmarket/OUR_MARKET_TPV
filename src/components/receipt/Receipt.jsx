@@ -60,7 +60,7 @@ class Ticket extends React.Component {
             <p>Fecha: {dateToLocalDate(new Date())}hs</p>
             <p>
               Cliente:{" "}
-              {`${this.props.selectOrder.shippingAddress.name} ${this.props.selectOrder.shippingAddress.lastName}`}
+              {`${this.props.selectOrder?.shippingAddress?.name || "Consumidor"} ${this.props.selectOrder?.shippingAddress?.lastName || "Final"}`}
             </p>
           </div>
           <div className="ticket-barcode">

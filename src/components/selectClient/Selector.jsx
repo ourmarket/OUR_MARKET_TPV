@@ -7,6 +7,7 @@ import {
   openDeliveryOrder,
   openLocalOrder,
 } from "../../redux/uiSlice";
+import { clearClient, addDeliveryTruck } from "../../redux/orderSlice";
 
 export const Selector = () => {
   const dispatch = useDispatch();
@@ -72,6 +73,17 @@ export const Selector = () => {
               onClick={() => dispatch(openLocalOrder())}
             >
               Orden local
+            </button>
+            <button
+              className={styles.btn_select_order}
+              style={{ backgroundColor: "#05839b", color: "#fff" }}
+              onClick={() => {
+                dispatch(clearClient());
+                dispatch(addDeliveryTruck(null));
+                dispatch(closeSelector());
+              }}
+            >
+              Consumidor Final
             </button>
             <div style={{ margin: "10px 0", borderTop: "1px solid #ccc" }}></div>
             <button
